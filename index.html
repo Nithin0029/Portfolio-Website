@@ -284,183 +284,236 @@
           </div>
 
           <div class="projects">
-            <!-- Attention Scanner -->
-            <article class="project">
-              <div class="project__media">
-                <p class="shot-wait">screenshot pending<br /><span>assets/img/attention-scanner.png</span></p>
-              </div>
-              <div class="project__body">
-                <div class="project__top">
-                  <h3>Attention Scanner</h3>
-                  <p class="project__year">2025&ndash;2026</p>
-                </div>
-                <p class="project__desc">
-                  A real-time computer vision system that tracks multiple people through a
-                  webcam and classifies each one as attentive, distracted, drowsy or
-                  yawning, scoring every session out of 100. Started as a 24-hour
-                  hackathon build and I've been developing it ever since.
-                </p>
-                <ul class="project__points">
-                  <li>
-                    Eye and mouth aspect ratios from a 468-point face mesh, plus head pose
-                    solved with OpenCV <code>solvePnP</code>
-                  </li>
-                  <li>
-                    Hysteresis thresholds and minimum-duration gates so a blink never
-                    registers as drowsiness
-                  </li>
-                  <li>
-                    Custom tracker whose search radius widens as a face stays missing, so
-                    people keep their ID after brief occlusion
-                  </li>
-                  <li>Ships as both a desktop OpenCV app and a FastAPI service behind a React dashboard</li>
-                </ul>
-                <dl class="receipts">
-                  <div>
-                    <dt>23</dt>
-                    <dd>test suites</dd>
-                  </div>
-                  <div>
-                    <dt>7,283</dt>
-                    <dd>lines of Python</dd>
-                  </div>
-                  <div>
-                    <dt>100%</dt>
-                    <dd>sole author</dd>
-                  </div>
-                </dl>
-                <ul class="tags">
-                  <li class="tag">Python</li>
-                  <li class="tag">MediaPipe</li>
-                  <li class="tag">OpenCV</li>
-                  <li class="tag">FastAPI</li>
-                  <li class="tag">React</li>
-                  <li class="tag">Docker</li>
-                </ul>
-                <div class="project__links">
-                  <a class="btn btn--ghost btn--sm" href="https://github.com/Nithin0029/Attention-Scanner" target="_blank" rel="noopener">Source code</a>
-                  <a class="btn btn--primary btn--sm" href="https://attention-scanner.vercel.app/" target="_blank" rel="noopener">Live demo</a>
-                </div>
-              </div>
-            </article>
+            <button class="card" type="button" data-opens="m-attention">
+              <span class="card__media">
+                <span class="shot-wait">screenshot pending<br /><span>attention-scanner.png</span></span>
+              </span>
+              <span class="card__body">
+                <span class="card__year">2025&ndash;2026</span>
+                <span class="card__title">Attention Scanner</span>
+                <span class="card__brief">
+                  Real-time computer vision that tracks several people at once and scores
+                  how attentive each one is.
+                </span>
+                <span class="card__more">View details</span>
+              </span>
+            </button>
 
-            <!-- Essential Expense Tracker -->
-            <article class="project">
-              <div class="project__media">
-                <p class="shot-wait">screenshot pending<br /><span>assets/img/expense-tracker.png</span></p>
-              </div>
-              <div class="project__body">
-                <div class="project__top">
-                  <h3>Essential Expense Tracker</h3>
-                  <p class="project__year">2026 &middot; v3.5.0</p>
-                </div>
-                <p class="project__desc">
-                  An offline-first Android app for tracking spending, budgets, recurring
-                  payments and money owed between friends, with optional Google Sheets
-                  sync and a biometric lock. It's on its fifth release and still being
-                  updated.
-                </p>
-                <ul class="project__points">
-                  <li>
-                    Built its own over-the-air update system — checks a remote version
-                    file, fetches release notes, downloads and installs the APK
-                  </li>
-                  <li>
-                    Offline-first storage in Room, with background sync to Google Sheets
-                    scheduled through WorkManager
-                  </li>
-                  <li>MPIN stored in encrypted preferences behind a biometric prompt</li>
-                  <li>Home-screen widget and automated scheduling for autopay and SIPs</li>
-                </ul>
-                <dl class="receipts">
-                  <div>
-                    <dt>v3.5.0</dt>
-                    <dd>shipped to users</dd>
-                  </div>
-                  <div>
-                    <dt>13,777</dt>
-                    <dd>lines of Kotlin</dd>
-                  </div>
-                  <div>
-                    <dt>91</dt>
-                    <dd>source files</dd>
-                  </div>
-                </dl>
-                <ul class="tags">
-                  <li class="tag">Kotlin</li>
-                  <li class="tag">Jetpack Compose</li>
-                  <li class="tag">Room</li>
-                  <li class="tag">Hilt</li>
-                  <li class="tag">WorkManager</li>
-                  <li class="tag">Sheets API</li>
-                </ul>
-                <div class="project__links">
-                  <a class="btn btn--ghost btn--sm" href="https://github.com/Nithin0029/Essentialkeyexpense" target="_blank" rel="noopener">Source code</a>
-                  <a class="btn btn--primary btn--sm" href="https://github.com/Nithin0029/Essentialkeyexpense/releases" target="_blank" rel="noopener">Download APK</a>
-                </div>
-              </div>
-            </article>
+            <button class="card" type="button" data-opens="m-expense">
+              <span class="card__media">
+                <span class="shot-wait">screenshot pending<br /><span>expense-tracker.png</span></span>
+              </span>
+              <span class="card__body">
+                <span class="card__year">2026 &middot; v3.5.0</span>
+                <span class="card__title">Essential Expense Tracker</span>
+                <span class="card__brief">
+                  An Android app for budgets, recurring payments and shared expenses, now
+                  on its fifth release.
+                </span>
+                <span class="card__more">View details</span>
+              </span>
+            </button>
 
-            <!-- Smart ASHA Connect -->
-            <article class="project">
-              <div class="project__media">
-                <p class="shot-wait">screenshot pending<br /><span>assets/img/asha-connect.png</span></p>
-              </div>
-              <div class="project__body">
-                <div class="project__top">
-                  <h3>Smart ASHA Connect</h3>
-                  <p class="project__year">2026</p>
-                </div>
-                <p class="project__desc">
-                  A healthcare platform for ASHA workers in rural India — patient
-                  records, visit history, vitals tracking and emergency dispatch. I built
-                  the Python service that scores each patient's health risk and explains
-                  the result in plain language.
-                </p>
-                <ul class="project__points">
-                  <li>
-                    XGBoost classifier scoring risk from seven clinical readings, returning
-                    a level with its confidence
-                  </li>
-                  <li>
-                    Falls back to deterministic clinical rules if the model fails, so the
-                    system still gives an answer
-                  </li>
-                  <li>Validates physiological ranges before inference to reject impossible readings</li>
-                  <li>
-                    Runs Llama 3 locally through Ollama rather than a paid API — cheaper,
-                    and patient data never leaves the machine
-                  </li>
-                </ul>
-                <dl class="receipts">
-                  <div>
-                    <dt>7</dt>
-                    <dd>clinical features</dd>
-                  </div>
-                  <div>
-                    <dt>3</dt>
-                    <dd>risk levels scored</dd>
-                  </div>
-                  <div>
-                    <dt>Local</dt>
-                    <dd>LLM, no API cost</dd>
-                  </div>
-                </dl>
-                <ul class="tags">
-                  <li class="tag">Python</li>
-                  <li class="tag">XGBoost</li>
-                  <li class="tag">Ollama</li>
-                  <li class="tag">React</li>
-                  <li class="tag">TypeScript</li>
-                  <li class="tag">Supabase</li>
-                </ul>
-                <div class="project__links">
-                  <a class="btn btn--ghost btn--sm" href="https://github.com/Nithin0029/ASHA-AI" target="_blank" rel="noopener">Source code</a>
-                  <a class="btn btn--primary btn--sm" href="https://asha-ai-nine.vercel.app/" target="_blank" rel="noopener">Live demo</a>
-                </div>
-              </div>
-            </article>
+            <button class="card" type="button" data-opens="m-asha">
+              <span class="card__media">
+                <span class="shot-wait">screenshot pending<br /><span>asha-connect.png</span></span>
+              </span>
+              <span class="card__body">
+                <span class="card__year">2026</span>
+                <span class="card__title">Smart ASHA Connect</span>
+                <span class="card__brief">
+                  A rural healthcare platform that scores patient risk from field-visit
+                  readings.
+                </span>
+                <span class="card__more">View details</span>
+              </span>
+            </button>
           </div>
+
+          <dialog class="modal" id="m-attention" aria-labelledby="m-attention-t">
+            <div class="modal__head">
+              <div>
+                <h3 id="m-attention-t">Attention Scanner</h3>
+                <p class="modal__year">2025&ndash;2026</p>
+              </div>
+              <button class="icon-btn modal__close" type="button" data-close aria-label="Close details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+            <div class="modal__body">
+              <p>
+                A real-time computer vision system that tracks multiple people through a
+                webcam and classifies each one as attentive, distracted, drowsy or yawning,
+                scoring every session out of 100. Started as a 24-hour hackathon build and
+                I've been developing it ever since.
+              </p>
+              <ul class="project__points">
+                <li>
+                  Eye and mouth aspect ratios from a 468-point face mesh, plus head pose
+                  solved with OpenCV <code>solvePnP</code>
+                </li>
+                <li>
+                  Hysteresis thresholds and minimum-duration gates so a blink never
+                  registers as drowsiness
+                </li>
+                <li>
+                  Custom tracker whose search radius widens as a face stays missing, so
+                  people keep their ID after brief occlusion
+                </li>
+                <li>Ships as both a desktop OpenCV app and a FastAPI service behind a React dashboard</li>
+              </ul>
+              <dl class="receipts">
+                <div>
+                  <dt>23</dt>
+                  <dd>test suites</dd>
+                </div>
+                <div>
+                  <dt>7,283</dt>
+                  <dd>lines of Python</dd>
+                </div>
+                <div>
+                  <dt>100%</dt>
+                  <dd>sole author</dd>
+                </div>
+              </dl>
+              <ul class="tags">
+                <li class="tag">Python</li>
+                <li class="tag">MediaPipe</li>
+                <li class="tag">OpenCV</li>
+                <li class="tag">FastAPI</li>
+                <li class="tag">React</li>
+                <li class="tag">Docker</li>
+              </ul>
+              <div class="project__links">
+                <a class="btn btn--ghost btn--sm" href="https://github.com/Nithin0029/Attention-Scanner" target="_blank" rel="noopener">Source code</a>
+                <a class="btn btn--primary btn--sm" href="https://attention-scanner.vercel.app/" target="_blank" rel="noopener">Live demo</a>
+              </div>
+            </div>
+          </dialog>
+
+          <dialog class="modal" id="m-expense" aria-labelledby="m-expense-t">
+            <div class="modal__head">
+              <div>
+                <h3 id="m-expense-t">Essential Expense Tracker</h3>
+                <p class="modal__year">2026 &middot; v3.5.0</p>
+              </div>
+              <button class="icon-btn modal__close" type="button" data-close aria-label="Close details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+            <div class="modal__body">
+              <p>
+                An offline-first Android app for tracking spending, budgets, recurring
+                payments and money owed between friends, with optional Google Sheets sync
+                and a biometric lock. It's on its fifth release and still being updated.
+              </p>
+              <ul class="project__points">
+                <li>
+                  Built its own over-the-air update system &mdash; checks a remote version
+                  file, fetches release notes, downloads and installs the APK
+                </li>
+                <li>
+                  Offline-first storage in Room, with background sync to Google Sheets
+                  scheduled through WorkManager
+                </li>
+                <li>MPIN stored in encrypted preferences behind a biometric prompt</li>
+                <li>Home-screen widget and automated scheduling for autopay and SIPs</li>
+              </ul>
+              <dl class="receipts">
+                <div>
+                  <dt>v3.5.0</dt>
+                  <dd>shipped to users</dd>
+                </div>
+                <div>
+                  <dt>13,777</dt>
+                  <dd>lines of Kotlin</dd>
+                </div>
+                <div>
+                  <dt>91</dt>
+                  <dd>source files</dd>
+                </div>
+              </dl>
+              <ul class="tags">
+                <li class="tag">Kotlin</li>
+                <li class="tag">Jetpack Compose</li>
+                <li class="tag">Room</li>
+                <li class="tag">Hilt</li>
+                <li class="tag">WorkManager</li>
+                <li class="tag">Sheets API</li>
+              </ul>
+              <div class="project__links">
+                <a class="btn btn--ghost btn--sm" href="https://github.com/Nithin0029/Essentialkeyexpense" target="_blank" rel="noopener">Source code</a>
+                <a class="btn btn--primary btn--sm" href="https://github.com/Nithin0029/Essentialkeyexpense/releases" target="_blank" rel="noopener">Download APK</a>
+              </div>
+            </div>
+          </dialog>
+
+          <dialog class="modal" id="m-asha" aria-labelledby="m-asha-t">
+            <div class="modal__head">
+              <div>
+                <h3 id="m-asha-t">Smart ASHA Connect</h3>
+                <p class="modal__year">2026</p>
+              </div>
+              <button class="icon-btn modal__close" type="button" data-close aria-label="Close details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+            <div class="modal__body">
+              <p>
+                A healthcare platform for ASHA workers in rural India &mdash; patient
+                records, visit history, vitals tracking and emergency dispatch. I built the
+                Python service that scores each patient's health risk and explains the
+                result in plain language.
+              </p>
+              <ul class="project__points">
+                <li>
+                  XGBoost classifier scoring risk from seven clinical readings, returning a
+                  level with its confidence
+                </li>
+                <li>
+                  Falls back to deterministic clinical rules if the model fails, so the
+                  system still gives an answer
+                </li>
+                <li>Validates physiological ranges before inference to reject impossible readings</li>
+                <li>
+                  Runs Llama 3 locally through Ollama rather than a paid API &mdash;
+                  cheaper, and patient data never leaves the machine
+                </li>
+              </ul>
+              <dl class="receipts">
+                <div>
+                  <dt>7</dt>
+                  <dd>clinical features</dd>
+                </div>
+                <div>
+                  <dt>3</dt>
+                  <dd>risk levels scored</dd>
+                </div>
+                <div>
+                  <dt>Local</dt>
+                  <dd>LLM, no API cost</dd>
+                </div>
+              </dl>
+              <ul class="tags">
+                <li class="tag">Python</li>
+                <li class="tag">XGBoost</li>
+                <li class="tag">Ollama</li>
+                <li class="tag">React</li>
+                <li class="tag">TypeScript</li>
+                <li class="tag">Supabase</li>
+              </ul>
+              <div class="project__links">
+                <a class="btn btn--ghost btn--sm" href="https://github.com/Nithin0029/ASHA-AI" target="_blank" rel="noopener">Source code</a>
+                <a class="btn btn--primary btn--sm" href="https://asha-ai-nine.vercel.app/" target="_blank" rel="noopener">Live demo</a>
+              </div>
+            </div>
+          </dialog>
         </div>
       </section>
 

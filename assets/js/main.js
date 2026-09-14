@@ -64,6 +64,35 @@
   setOpen(false);
 })();
 
+/* ---------- project detail dialogs ---------- */
+
+(() => {
+  let opener = null;
+
+  document.querySelectorAll("[data-opens]").forEach((card) => {
+    card.addEventListener("click", () => {
+      const dialog = document.getElementById(card.dataset.opens);
+      if (!dialog) return;
+      opener = card;
+      dialog.showModal();
+    });
+  });
+
+  document.querySelectorAll("dialog.modal").forEach((dialog) => {
+    dialog.querySelector("[data-close]")?.addEventListener("click", () => dialog.close());
+
+    // Clicking the backdrop lands on the dialog element itself, not its contents.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener("close", () => {
+      opener?.focus();
+      opener = null;
+    });
+  });
+})();
+
 /* ---------- copy email ---------- */
 
 (() => {
