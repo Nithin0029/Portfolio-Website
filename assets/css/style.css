@@ -867,6 +867,82 @@ a {
   font-size: 0.9rem;
 }
 
+/* ================= scroll behaviour ================= */
+
+html {
+  scroll-behavior: smooth;
+}
+main > section {
+  scroll-margin-top: 80px;
+}
+
+/* ================= scroll reveal ================= */
+
+/* Gated on .js so content is never hidden when scripting is unavailable.
+   :where() keeps specificity at zero so .is-in always wins. */
+.js
+  :where(
+    .section__head,
+    .about__body,
+    .facts,
+    .skill,
+    .card,
+    .award,
+    .scroll-hint,
+    .channels,
+    #contact-form
+  ) {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.js .is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ================= dialog entrance ================= */
+
+.modal[open] {
+  animation: modal-in 0.3s var(--ease);
+}
+.modal[open]::backdrop {
+  animation: backdrop-in 0.3s ease;
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ================= nav underline ================= */
+
+.nav__link {
+  position: relative;
+}
+.nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s var(--ease);
+}
+.nav__link:hover::after {
+  transform: scaleX(1);
+}
+
 /* ================= hero entrance ================= */
 
 .rise {
@@ -915,13 +991,29 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
-  .rise {
+  .rise,
+  .js
+    :where(
+      .section__head,
+      .about__body,
+      .facts,
+      .skill,
+      .card,
+      .award,
+      .scroll-hint,
+      .channels,
+      #contact-form
+    ) {
     opacity: 1;
     transform: none;
   }

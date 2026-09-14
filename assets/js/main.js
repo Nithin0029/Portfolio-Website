@@ -1,3 +1,86 @@
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+/* ---------- scroll reveal ---------- */
+
+(() => {
+  const targets = document.querySelectorAll(
+    ".section__head, .about__body, .facts, .skill, .card, .award, .scroll-hint, .channels, #contact-form",
+  );
+
+  if (reduceMotion.matches || !("IntersectionObserver" in window)) {
+    targets.forEach((el) => el.classList.add("is-in"));
+    return;
+  }
+
+  // Items in a group step in one after another rather than all at once.
+  const groups = new Map();
+  targets.forEach((el) => {
+    const key = el.parentElement;
+    const index = groups.get(key) ?? 0;
+    groups.set(key, index + 1);
+    if (index) el.style.transitionDelay = `${Math.min(index, 5) * 70}ms`;
+  });
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-in");
+        io.unobserve(entry.target);
+      });
+    },
+    { rootMargin: "0px 0px -12% 0px", threshold: 0.08 },
+  );
+
+  targets.forEach((el) => io.observe(el));
+})();
+
+/* ---------- metric count-up ---------- */
+
+(() => {
+  const metrics = document.querySelectorAll(".metric__n");
+  if (!metrics.length) return;
+
+  const parse = (text) => {
+    const match = text.match(/^([\d,]+)(.*)$/);
+    if (!match) return null;
+    return { value: Number(match[1].replace(/,/g, "")), suffix: match[2] };
+  };
+
+  const run = (el) => {
+    const parsed = parse(el.textContent.trim());
+    if (!parsed || parsed.value === 0) return;
+
+    const duration = 900;
+    const start = performance.now();
+
+    const step = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const current = Math.round(parsed.value * eased);
+      el.textContent = current.toLocaleString("en-US") + parsed.suffix;
+      if (t < 1) requestAnimationFrame(step);
+    };
+
+    requestAnimationFrame(step);
+  };
+
+  if (reduceMotion.matches || !("IntersectionObserver" in window)) return;
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        run(entry.target);
+        io.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.5 },
+  );
+
+  metrics.forEach((el) => io.observe(el));
+})();
+
 /* ---------- theme ---------- */
 
 (() => {
