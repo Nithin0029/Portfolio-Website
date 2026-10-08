@@ -26,24 +26,11 @@ const services = [
   },
 ];
 
-const subject = "Freelance enquiry";
-// A body template, so the first message already carries what I need to answer.
-const body = [
-  "Hi Nithelan,",
-  "",
-  "What I need:",
-  "Timeline:",
-  "Budget:",
-  "",
-].join("\n");
-
-const mailto = `mailto:${links.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-// Works when no mail app is registered, which is most desktops.
-const gmail =
-  "https://mail.google.com/mail/?view=cm&fs=1" +
-  `&to=${encodeURIComponent(links.email)}` +
-  `&su=${encodeURIComponent(subject)}` +
-  `&body=${encodeURIComponent(body)}`;
+// The enquiry is composed in the browser from what the visitor types. There is
+// no server behind this site, so a form that posted somewhere would either
+// need a third party holding the mail or would quietly go nowhere. This writes
+// a real message and hands it to whichever mail route they have.
+const timelines = ["As soon as possible", "Within a month", "One to three months", "Flexible"];
 ---
 
 <section class="sec wrap" id="freelance" aria-labelledby="freelance-title">
@@ -56,36 +43,176 @@ const gmail =
     <div class="fl__intro sd-rise">
       <p>
         I take on freelance projects in the same areas I build in for myself. Every line
-        opposite is something I have shipped and can show you the code for.
+        below is something I have shipped and can show you the code for.
       </p>
       <p class="fl__note">
         Tell me what you need and the deadline you're working to, and I'll tell you
         straight whether I can do it.
       </p>
 
-      <div class="fl__cta" data-copy-scope>
-        <a class="btn btn--primary" href={mailto}>Start a project</a>
-        <a class="btn" href={gmail} target="_blank" rel="noopener noreferrer">Open in Gmail</a>
-        <button class="btn" type="button" data-copy={links.email}>
-          <span data-copy-label>Copy address</span>
-        </button>
-        <p class="fl__status" role="status" data-copy-status></p>
-      </div>
+      <ul class="fl__list" role="list">
+        {
+          services.map((s) => (
+            <li>
+              <h3>{s.title}</h3>
+              <p>{s.what}</p>
+              <p class="fl__ev">{s.evidence}</p>
+            </li>
+          ))
+        }
+      </ul>
     </div>
 
-    <ul class="fl__list sd-rise" role="list">
-      {
-        services.map((s) => (
-          <li>
-            <h3>{s.title}</h3>
-            <p>{s.what}</p>
-            <p class="fl__ev">{s.evidence}</p>
-          </li>
-        ))
-      }
-    </ul>
+    <form class="rq sd-rise" data-enquiry novalidate aria-labelledby="rq-title">
+      <div class="rq__tab">
+        <span class="rq__kind" id="rq-title">Enquiry</span>
+        <span class="rq__ref">For {links.email}</span>
+      </div>
+
+      <div class="rq__body">
+        <div class="rq__row">
+          <div class="rq__field">
+            <label for="rq-name">Your name</label>
+            <input id="rq-name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="rq__field">
+            <label for="rq-email">Your email</label>
+            <input id="rq-email" name="email" type="email" autocomplete="email" required />
+          </div>
+        </div>
+
+        <div class="rq__field">
+          <label for="rq-work">What you need</label>
+          <select id="rq-work" name="work" required>
+            <option value="">Choose one</option>
+            {services.map((s) => <option value={s.title}>{s.title}</option>)}
+            <option value="Something else">Something else</option>
+          </select>
+        </div>
+
+        <div class="rq__row">
+          <div class="rq__field">
+            <label for="rq-when">Timeline</label>
+            <select id="rq-when" name="when">
+              <option value="">Not sure yet</option>
+              {timelines.map((t) => <option value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div class="rq__field">
+            <label for="rq-budget">
+              Budget <span class="rq__opt">optional</span>
+            </label>
+            <input id="rq-budget" name="budget" type="text" placeholder="A range is fine" />
+          </div>
+        </div>
+
+        <div class="rq__field">
+          <label for="rq-detail">Details</label>
+          <textarea id="rq-detail" name="detail" rows="4" required
+            placeholder="What are you building, and what does done look like?"></textarea>
+        </div>
+
+        <p class="rq__error" role="alert" data-enquiry-error hidden></p>
+
+        <details class="rq__preview">
+          <summary>Preview the message</summary>
+          <pre data-enquiry-preview></pre>
+        </details>
+
+        <div class="rq__actions" data-copy-scope>
+          <button class="btn btn--primary" type="submit">Open in your mail app</button>
+          <a class="btn" data-enquiry-gmail href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(links.email)}`} target="_blank" rel="noopener noreferrer">Open in Gmail</a>
+          <button class="btn" type="button" data-copy="" data-enquiry-copy>
+            <span data-copy-label>Copy the message</span>
+          </button>
+        </div>
+
+        <p class="rq__status" role="status" data-copy-status></p>
+        <p class="rq__fine">
+          Nothing is sent from this page. Both buttons open the message in your own mail,
+          so you can read it before it goes.
+        </p>
+      </div>
+    </form>
   </div>
 </section>
+
+<script>
+  const setup = () => {
+    const form = document.querySelector<HTMLFormElement>("[data-enquiry]");
+    if (!form) return;
+
+    const gmail = form.querySelector<HTMLAnchorElement>("[data-enquiry-gmail]");
+    const copy = form.querySelector<HTMLButtonElement>("[data-enquiry-copy]");
+    const preview = form.querySelector<HTMLElement>("[data-enquiry-preview]");
+    const error = form.querySelector<HTMLElement>("[data-enquiry-error]");
+    const to = new URL(gmail!.href).searchParams.get("to") ?? "";
+
+    const val = (name: string) =>
+      (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | null)?.value.trim() ?? "";
+
+    const compose = () => {
+      const work = val("work");
+      const subject = work ? `Freelance enquiry — ${work}` : "Freelance enquiry";
+      const lines = [
+        `Hi Nithelan,`,
+        ``,
+        `Name: ${val("name") || "—"}`,
+        `Email: ${val("email") || "—"}`,
+        `Work: ${work || "—"}`,
+        `Timeline: ${val("when") || "Not sure yet"}`,
+      ];
+      if (val("budget")) lines.push(`Budget: ${val("budget")}`);
+      lines.push(``, `Details:`, val("detail") || "—", ``);
+      return { subject, body: lines.join("\n") };
+    };
+
+    // Everything downstream of the fields is rebuilt as they are typed in, so
+    // the links and the preview are never out of step with the form.
+    const refresh = () => {
+      const { subject, body } = compose();
+      if (preview) preview.textContent = `Subject: ${subject}\n\n${body}`;
+      if (copy) copy.dataset.copy = `Subject: ${subject}\n\n${body}`;
+      if (gmail) {
+        gmail.href =
+          "https://mail.google.com/mail/?view=cm&fs=1" +
+          `&to=${encodeURIComponent(to)}` +
+          `&su=${encodeURIComponent(subject)}` +
+          `&body=${encodeURIComponent(body)}`;
+      }
+    };
+
+    form.addEventListener("input", refresh);
+    form.addEventListener("change", refresh);
+    refresh();
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      // Named so the message says which field, rather than "fill in the form".
+      const missing: string[] = [];
+      if (!val("name")) missing.push("your name");
+      if (!val("email")) missing.push("your email");
+      if (!val("work")) missing.push("what you need");
+      if (!val("detail")) missing.push("some detail");
+
+      if (error) {
+        if (missing.length) {
+          error.textContent = `Add ${missing.join(", ")} first.`;
+          error.hidden = false;
+          (form.querySelector(":invalid, [value='']") as HTMLElement | null)?.focus();
+          return;
+        }
+        error.hidden = true;
+      }
+
+      const { subject, body } = compose();
+      window.location.href =
+        `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+  };
+
+  document.addEventListener("astro:page-load", setup);
+</script>
 
 <style>
   .fl {
@@ -94,7 +221,7 @@ const gmail =
   }
   @media (min-width: 60rem) {
     .fl {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
       column-gap: var(--space-8);
       align-items: start;
     }
@@ -103,8 +230,6 @@ const gmail =
   .fl__intro {
     display: grid;
     gap: var(--space-4);
-    justify-items: start;
-    max-width: 44ch;
     font-family: var(--prose);
     font-weight: 300;
     font-size: var(--step-1);
@@ -114,39 +239,24 @@ const gmail =
     color: var(--text-2);
     font-size: var(--step-0);
   }
-  .fl__cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
-  }
-  .fl__status {
-    flex-basis: 100%;
-    min-height: 1.4em;
-    margin: 0;
-    color: var(--text-2);
-    font-family: var(--sans);
-    font-size: var(--step--1);
-  }
 
   .fl__list {
     display: grid;
     gap: 0;
-    margin: 0;
+    margin: var(--space-2) 0 0;
     padding: 0;
     list-style: none;
     border-top: 1px solid var(--rule-2);
   }
   .fl__list li {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2);
-    padding: var(--space-5) 0;
+    padding: var(--space-4) 0;
     border-bottom: 1px solid var(--rule);
   }
   .fl__list h3 {
-    margin: 0 0 var(--space-2);
+    margin: 0;
+    font-family: var(--sans);
     font-size: var(--step-0);
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -157,13 +267,167 @@ const gmail =
     font-family: var(--prose);
     font-weight: 300;
     color: var(--text-2);
-    font-size: var(--step-0);
-    line-height: 1.65;
+    font-size: var(--step--1);
+    line-height: 1.6;
   }
   .fl__list .fl__ev {
-    margin-top: var(--space-2);
     font-family: var(--mono);
     font-size: 0.8125rem;
     color: var(--text-3);
+  }
+
+  /* ---- the enquiry, laid out as a request sheet ---- */
+
+  .rq {
+    background: var(--raised);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius);
+    box-shadow: var(--lift);
+    overflow: hidden;
+  }
+  .rq__tab {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .rq__kind {
+    color: var(--accent);
+  }
+  .rq__ref {
+    font-family: var(--mono);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .rq__body {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-4);
+  }
+  .rq__row {
+    display: grid;
+    gap: var(--space-4);
+  }
+  @media (min-width: 30rem) {
+    .rq__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .rq__field {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+  .rq__field label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .rq__opt {
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  .rq__field :is(input, select, textarea) {
+    width: 100%;
+    min-width: 0;
+    padding: var(--space-3);
+    font: inherit;
+    font-size: var(--step--1);
+    color: var(--text);
+    background: var(--ground);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--dur-1) linear;
+  }
+  .rq__field textarea {
+    resize: vertical;
+    min-height: 6rem;
+    font-family: var(--prose);
+    line-height: 1.6;
+  }
+  .rq__field :is(input, select, textarea):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+  .rq__field ::placeholder {
+    color: var(--text-3);
+    opacity: 1;
+  }
+
+  .rq__error {
+    margin: 0;
+    padding: var(--space-3);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+    font-size: var(--step--1);
+  }
+
+  .rq__preview summary {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    cursor: pointer;
+  }
+  .rq__preview summary:hover {
+    color: var(--text);
+  }
+  .rq__preview pre {
+    margin: var(--space-3) 0 0;
+    padding: var(--space-3);
+    max-height: 16rem;
+    overflow: auto;
+    background: var(--ground);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--text-2);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .rq__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .rq__status {
+    min-height: 1.4em;
+    margin: 0;
+    color: var(--text-2);
+    font-size: var(--step--1);
+  }
+  .rq__fine {
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rq__field :is(input, select, textarea) {
+      transition: none;
+    }
   }
 </style>
