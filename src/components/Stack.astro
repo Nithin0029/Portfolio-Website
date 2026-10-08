@@ -1,17 +1,14 @@
 ---
 import { stack } from "../data/stack";
 
-// A drawing's parts list: item number, quantity, and what the item consists of.
-// The numbering is a parts-list convention and the quantities are counted from
-// the data, so both carry information rather than decorating the table.
+// A drawing's parts list: item number, group, and what the item consists of.
+// The numbering is a parts-list convention, so it carries information rather
+// than decorating the table.
 const rows = stack.map((g, i) => ({
   item: String(i + 1).padStart(2, "0"),
   group: g.group,
-  qty: g.items.length,
   parts: g.items.map((t) => t.name),
 }));
-
-const total = rows.reduce((n, r) => n + r.qty, 0);
 ---
 
 <section class="sec wrap" id="stack" aria-labelledby="stack-title">
@@ -24,7 +21,6 @@ const total = rows.reduce((n, r) => n + r.qty, 0);
     <li class="bom__head" aria-hidden="true">
       <span>Item</span>
       <span>Group</span>
-      <span>Qty</span>
       <span>Parts</span>
     </li>
 
@@ -33,7 +29,6 @@ const total = rows.reduce((n, r) => n + r.qty, 0);
         <li class="bom__row">
           <span class="bom__item num">{r.item}</span>
           <h3 class="bom__group">{r.group}</h3>
-          <span class="bom__qty num">{r.qty}</span>
           <ul class="bom__parts" role="list">
             {r.parts.map((p) => (
               <li>{p}</li>
@@ -42,13 +37,6 @@ const total = rows.reduce((n, r) => n + r.qty, 0);
         </li>
       ))
     }
-
-    <li class="bom__total">
-      <span class="bom__item" aria-hidden="true"></span>
-      <span class="bom__group">Total</span>
-      <span class="bom__qty num">{total}</span>
-      <span aria-hidden="true"></span>
-    </li>
   </ol>
 </section>
 
@@ -61,8 +49,7 @@ const total = rows.reduce((n, r) => n + r.qty, 0);
   }
 
   .bom__head,
-  .bom__row,
-  .bom__total {
+  .bom__row {
     display: grid;
     gap: var(--space-2) var(--space-5);
     padding: var(--space-4) 0;
@@ -70,9 +57,8 @@ const total = rows.reduce((n, r) => n + r.qty, 0);
   }
   @media (min-width: 52rem) {
     .bom__head,
-    .bom__row,
-    .bom__total {
-      grid-template-columns: 2.5rem 11rem 2.5rem minmax(0, 1fr);
+    .bom__row {
+      grid-template-columns: 2.5rem 11rem minmax(0, 1fr);
       align-items: baseline;
     }
   }
@@ -94,8 +80,7 @@ const total = rows.reduce((n, r) => n + r.qty, 0);
     }
   }
 
-  .bom__item,
-  .bom__qty {
+  .bom__item {
     color: var(--text-3);
     font-size: var(--step--1);
   }
@@ -133,18 +118,8 @@ const total = rows.reduce((n, r) => n + r.qty, 0);
     color: var(--text);
   }
 
-  /* a parts list closes on its total */
-  .bom__total {
+  .bom__row:last-child {
     border-bottom: 0;
-    font-weight: 600;
-  }
-  .bom__total .bom__group {
-    color: var(--text-3);
-    font-size: 0.75rem;
-    letter-spacing: 0.09em;
-  }
-  .bom__total .bom__qty {
-    color: var(--text);
   }
 
   @media (prefers-reduced-motion: reduce) {
