@@ -1,0 +1,155 @@
+---
+import { stack } from "../data/stack";
+
+// A drawing's parts list: item number, quantity, and what the item consists of.
+// The numbering is a parts-list convention and the quantities are counted from
+// the data, so both carry information rather than decorating the table.
+const rows = stack.map((g, i) => ({
+  item: String(i + 1).padStart(2, "0"),
+  group: g.group,
+  qty: g.items.length,
+  parts: g.items.map((t) => t.name),
+}));
+
+const total = rows.reduce((n, r) => n + r.qty, 0);
+---
+
+<section class="sec wrap" id="stack" aria-labelledby="stack-title">
+  <header class="sec__head">
+    <h2 id="stack-title">Technical profile</h2>
+    <p>Only what I have shipped in my own commits.</p>
+  </header>
+
+  <ol class="bom" role="list">
+    <li class="bom__head" aria-hidden="true">
+      <span>Item</span>
+      <span>Group</span>
+      <span>Qty</span>
+      <span>Parts</span>
+    </li>
+
+    {
+      rows.map((r) => (
+        <li class="bom__row">
+          <span class="bom__item num">{r.item}</span>
+          <h3 class="bom__group">{r.group}</h3>
+          <span class="bom__qty num">{r.qty}</span>
+          <ul class="bom__parts" role="list">
+            {r.parts.map((p) => (
+              <li>{p}</li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+
+    <li class="bom__total">
+      <span class="bom__item" aria-hidden="true"></span>
+      <span class="bom__group">Total</span>
+      <span class="bom__qty num">{total}</span>
+      <span aria-hidden="true"></span>
+    </li>
+  </ol>
+</section>
+
+<style>
+  .bom {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-2);
+  }
+
+  .bom__head,
+  .bom__row,
+  .bom__total {
+    display: grid;
+    gap: var(--space-2) var(--space-5);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (min-width: 52rem) {
+    .bom__head,
+    .bom__row,
+    .bom__total {
+      grid-template-columns: 2.5rem 11rem 2.5rem minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+
+  .bom__head {
+    display: none;
+    padding-block: var(--space-2);
+    border-bottom: 1px solid var(--rule-2);
+    background: var(--ground);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  @media (min-width: 52rem) {
+    .bom__head {
+      display: grid;
+    }
+  }
+
+  .bom__item,
+  .bom__qty {
+    color: var(--text-3);
+    font-size: var(--step--1);
+  }
+
+  .bom__group {
+    margin: 0;
+    font-size: var(--step-0);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+
+  .bom__parts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-width: 0;
+  }
+  .bom__parts li {
+    padding: 0.1rem 0.5rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    background: var(--raised);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-2);
+    transition: border-color var(--dur-1) linear, color var(--dur-1) linear;
+  }
+  .bom__parts li:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  /* a parts list closes on its total */
+  .bom__total {
+    border-bottom: 0;
+    font-weight: 600;
+  }
+  .bom__total .bom__group {
+    color: var(--text-3);
+    font-size: 0.75rem;
+    letter-spacing: 0.09em;
+  }
+  .bom__total .bom__qty {
+    color: var(--text);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bom__parts li {
+      transition: none;
+    }
+  }
+</style>

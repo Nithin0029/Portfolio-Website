@@ -1,0 +1,768 @@
+---
+import { getCollection, render } from "astro:content";
+import { Picture } from "astro:assets";
+
+const entries = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+const projects = await Promise.all(
+  entries.map(async (entry) => ({ ...entry, Content: (await render(entry)).Content })),
+);
+
+const others = [
+  {
+    id: "study-light",
+    title: "Study light",
+    kind: "Firmware, hardware",
+    meta: "Sole developer, Sep 2026",
+    summary:
+      "A relay wired in between my room's wall switch and its tube light, so the light answers to Wi-Fi and to voice while the physical switch keeps working.",
+    facts: [
+      { label: "Board", value: "ESP32 Dev Module" },
+      { label: "Switched load", value: "230 V tube light" },
+      { label: "Control", value: "SinricPro, Alexa / Google Home" },
+      { label: "Firmware", value: "44 lines of C++" },
+      { label: "Commits", value: "4, all mine" },
+    ],
+    notes: [
+      "The relay switches the live line through its normally-open contact, on purpose. If the ESP32 crashes or loses power the coil de-energises, the contact springs open and the light fails off rather than on. Neutral never passes through the relay at all.",
+      "SinricPro 5.x uses std::variant internally, which needs C++17, but the ESP32 Arduino core still compiles at -std=gnu++11. The build has to unset that flag before adding its own, or it fails inside the library rather than in my code.",
+      "The ON and OFF constants are flipped relative to the raw relay, which triggers on a LOW input. On the bench SinricPro reported the opposite of what the relay actually did, so I swapped the meaning of the two constants instead of hiding the mismatch behind an inverted write, and left a comment saying to re-verify it on any new relay module.",
+      "Wi-Fi and SinricPro credentials live in a gitignored secrets.h, with an example header committed in its place. The repository also holds an MQ-135 smoke sensor sketch, still standalone — it reads on an ADC1 pin so it keeps working once Wi-Fi is added.",
+    ],
+    technologies: ["C++17", "PlatformIO", "ESP32", "Arduino", "SinricPro"],
+    links: [{ label: "Source on GitHub", href: "https://github.com/Nithin0029/Smart-Room" }],
+  },
+  {
+    id: "t7-logistics",
+    title: "T7-Logistics",
+    kind: "Web app, hackathon build",
+    meta: "Team build, Apr 2026",
+    summary:
+      "A quick-commerce control centre where simulated agents pick a store, check stock, dispatch and route an order.",
+    facts: [{ label: "Result", value: "Best Implementation, Vibeathon 2k26" }],
+    notes: [] as string[],
+    technologies: ["React", "Express"],
+    links: [{ label: "Source on GitHub", href: "https://github.com/Nithin0029/T7-Logistics" }],
+  },
+];
+
+const fig = (i: number) => String(i + 1).padStart(2, "0");
+---
+
+<section class="sec wrap" id="work" aria-labelledby="work-title">
+  <header class="sec__head">
+    <h2 id="work-title">Selected work</h2>
+    <p>Three I would defend in an interview. Open one.</p>
+  </header>
+
+  <ul class="plates" role="list">
+    {
+      projects.map(({ id, data }, i) => (
+        <li>
+          <button class="plate" type="button" data-opens={`d-${id}`} aria-haspopup="dialog">
+            <span class="plate__tab">
+              <span class="plate__fig">Fig. {fig(i)}</span>
+              <span class="plate__kind">{data.kind}</span>
+            </span>
+
+            <span class="plate__visual">
+              {data.cover && data.cover.shape === "phones" ? (
+                <span class="plate__phones">
+                  {data.gallery.slice(0, 2).map((g) => (
+                    <Picture src={g.src} alt="" widths={[180, 270]} sizes="7rem" formats={["avif", "webp"]} />
+                  ))}
+                </span>
+              ) : data.cover ? (
+                <Picture src={data.cover.src} alt="" widths={[360, 540]} sizes="(min-width: 48rem) 22rem, 88vw" formats={["avif", "webp"]} />
+              ) : (
+                <span class="plate__spec">
+                  {data.facts.slice(0, 3).map((f) => (
+                    <span class="plate__spec-row">
+                      <span>{f.label}</span>
+                      <b>{f.value}</b>
+                    </span>
+                  ))}
+                </span>
+              )}
+            </span>
+
+            <span class="plate__body">
+              <span class="plate__title">{data.title}</span>
+              <span class="plate__summary">{data.summary}</span>
+              <span class="plate__chips">
+                {data.technologies.slice(0, 3).map((t) => (
+                  <span>{t}</span>
+                ))}
+                {data.technologies.length > 3 && <span class="plate__chips-rest">+{data.technologies.length - 3}</span>}
+              </span>
+              <span class="plate__open" aria-hidden="true">Open plate</span>
+            </span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="also sd-rise">
+    <h3 class="also__title">Also on GitHub</h3>
+    <ul class="also__list" role="list">
+      {
+        others.map((o) => (
+          <li>
+            <button class="plate plate--small" type="button" data-opens={`d-${o.id}`} aria-haspopup="dialog">
+              <span class="plate__tab">
+                <span class="plate__kind">{o.kind}</span>
+              </span>
+              <span class="plate__body">
+                <span class="plate__title">{o.title}</span>
+                <span class="plate__summary">{o.summary}</span>
+                <span class="plate__chips">
+                  {o.technologies.slice(0, 3).map((t) => (
+                    <span>{t}</span>
+                  ))}
+                </span>
+                <span class="plate__open" aria-hidden="true">Open plate</span>
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+{
+  projects.map(({ id, data, Content }, i) => (
+      <dialog class="sheet" id={`d-${id}`} aria-labelledby={`d-${id}-t`}>
+        <div class="sheet__head">
+          <div>
+            <p class="sheet__kind">Fig. {fig(i)} — {data.kind}</p>
+            <h3 id={`d-${id}-t`}>{data.title}</h3>
+            <p class="sheet__meta">{data.role}, {data.period}</p>
+          </div>
+          <button class="sheet__x" type="button" data-close aria-label={`Close ${data.title}`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="sheet__body">
+          {data.cover && (
+            <figure class="sheet__plate">
+              <div class={data.cover.shape === "phones" ? "sheet__frame sheet__frame--tall" : "sheet__frame"}>
+                <Picture
+                  src={data.cover.src}
+                  alt={data.cover.alt}
+                  widths={[480, 720]}
+                  sizes="(min-width: 48rem) 34rem, 88vw"
+                  formats={["avif", "webp"]}
+                />
+              </div>
+            </figure>
+          )}
+
+          <p class="sheet__summary">{data.summary}</p>
+
+          <dl class="sheet__facts">
+            {data.facts.map((f) => (
+              <div>
+                <dt>{f.label}</dt>
+                <dd class="num">{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div class="sheet__prose">
+            <Content />
+          </div>
+
+          <div class="sheet__tech">
+            <p class="sheet__tech-label">Built with</p>
+            <ul role="list">
+              {data.technologies.map((t) => (
+                <li>{t}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="sheet__actions">
+            {data.links.map((l, n) => (
+              <a class:list={["btn", n === 0 && "btn--primary"]} href={l.href}>{l.label}</a>
+            ))}
+          </div>
+        </div>
+      </dialog>
+  ))
+}
+
+{
+  others.map((o) => (
+    <dialog class="sheet" id={`d-${o.id}`} aria-labelledby={`d-${o.id}-t`}>
+      <div class="sheet__head">
+        <div>
+          <p class="sheet__kind">{o.kind}</p>
+          <h3 id={`d-${o.id}-t`}>{o.title}</h3>
+          <p class="sheet__meta">{o.meta}</p>
+        </div>
+        <button class="sheet__x" type="button" data-close aria-label={`Close ${o.title}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="sheet__body">
+        <p class="sheet__summary">{o.summary}</p>
+
+        <dl class="sheet__facts">
+          {o.facts.map((f) => (
+            <div>
+              <dt>{f.label}</dt>
+              <dd class="num">{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        {o.notes.length > 0 && (
+          <div class="sheet__notes">
+            <p class="sheet__tech-label">How it works</p>
+            {o.notes.map((n) => (
+              <p>{n}</p>
+            ))}
+          </div>
+        )}
+
+        <div class="sheet__tech">
+          <p class="sheet__tech-label">Built with</p>
+          <ul role="list">
+            {o.technologies.map((t) => (
+              <li>{t}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="sheet__actions">
+          {o.links.map((l) => (
+            <a class="btn btn--primary" href={l.href}>{l.label}</a>
+          ))}
+        </div>
+      </div>
+    </dialog>
+  ))
+}
+
+<script>
+  // Re-runs after every client-side navigation, because the ClientRouter
+  // swaps the document and the listeners below go with it.
+  const setup = () => {
+    const root = document.documentElement;
+    const dialogs = document.querySelectorAll<HTMLDialogElement>("dialog.sheet");
+    if (!dialogs.length) return;
+    let opener: HTMLElement | null = null;
+
+    const lock = () => {
+      const bar = window.innerWidth - root.clientWidth;
+      root.style.setProperty("--sheet-gutter", `${bar}px`);
+      root.classList.add("sheet-open");
+    };
+    const unlock = () => {
+      root.classList.remove("sheet-open");
+      root.style.removeProperty("--sheet-gutter");
+    };
+
+    // Idempotent, because it is reached from every route out of a dialog: the
+    // close button, the backdrop, Escape, and the close event as a backstop.
+    // Leaving the page locked because one hook failed to fire would strand the
+    // visitor with a page they cannot scroll.
+    const release = () => {
+      unlock();
+      const back = opener;
+      opener = null;
+      back?.focus();
+    };
+
+    document.querySelectorAll<HTMLButtonElement>("[data-opens]").forEach((card) => {
+      card.addEventListener("click", () => {
+        const sheet = document.getElementById(card.dataset.opens!) as HTMLDialogElement | null;
+        if (!sheet) return;
+        opener = card;
+        lock();
+        sheet.showModal();
+      });
+    });
+
+    dialogs.forEach((sheet) => {
+      const dismiss = () => {
+        sheet.close();
+        release();
+      };
+      sheet.querySelector("[data-close]")?.addEventListener("click", dismiss);
+      sheet.addEventListener("click", (e) => {
+        if (e.target === sheet) dismiss();
+      });
+      sheet.addEventListener("cancel", release);
+      sheet.addEventListener("close", release);
+    });
+  };
+
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .plates {
+    display: grid;
+    gap: var(--space-5);
+    padding: 0;
+    margin: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+
+  /* A plate: a drawing laid on the sheet, tabbed with its figure number. */
+  .plate {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: var(--raised);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius);
+    box-shadow: var(--lift);
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+      border-color var(--dur-2) var(--ease-out),
+      box-shadow var(--dur-2) var(--ease-out),
+      transform var(--dur-2) var(--ease-out);
+  }
+  .plate:is(:hover, :focus-visible) {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: var(--lift-hover);
+  }
+
+  .plate__tab {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--rule);
+    background: var(--ground);
+  }
+  .plate__fig {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+  .plate__kind {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .plate__visual {
+    display: grid;
+    place-items: center;
+    height: 11rem;
+    padding: var(--space-4);
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+    overflow: hidden;
+  }
+  .plate__visual :global(img) {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+    border: 1px solid var(--rule-2);
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+  .plate:is(:hover, :focus-visible) .plate__visual :global(img) {
+    transform: scale(1.04);
+  }
+  .plate__phones {
+    display: flex;
+    gap: var(--space-3);
+    height: 100%;
+    align-items: center;
+  }
+  .plate__phones :global(img) {
+    max-height: 100%;
+    width: auto;
+  }
+  .plate__spec {
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+  }
+  .plate__spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-3);
+  }
+  .plate__spec-row b {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .plate__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-4) var(--space-5);
+    flex: 1;
+  }
+  .plate__title {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: var(--step-2);
+    line-height: 1.15;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    transition: color var(--dur-2) var(--ease-out);
+  }
+  .plate:is(:hover, :focus-visible) .plate__title {
+    color: var(--accent);
+  }
+  .plate__summary {
+    font-family: var(--prose);
+    font-weight: 300;
+    color: var(--text-2);
+    font-size: var(--step-0);
+    line-height: 1.55;
+  }
+  .plate__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .plate__chips span {
+    padding: 0.1rem 0.5rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    background: var(--ground);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+  .plate__chips .plate__chips-rest {
+    border-style: dashed;
+  }
+  .plate__open {
+    margin-top: auto;
+    padding-top: var(--space-4);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* ---- dialog ---- */
+
+  .sheet {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(42rem, calc(100vw - 2rem));
+    height: fit-content;
+    max-height: min(86vh, 54rem);
+    padding: 0;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius);
+    background: var(--raised);
+    color: var(--text);
+    box-shadow: var(--lift-hover);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .sheet::backdrop {
+    background: rgb(20 23 26 / 0.62);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sheet[open] {
+      animation: sheet-in var(--dur-3) var(--ease-out);
+    }
+    .sheet[open]::backdrop {
+      animation: scrim-in var(--dur-3) var(--ease-out);
+    }
+  }
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+    }
+  }
+  @keyframes scrim-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .sheet__head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    background: var(--raised);
+    border-bottom: 1px solid var(--rule);
+  }
+  .sheet__kind {
+    margin: 0 0 var(--space-1);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+  .sheet__head h3 {
+    margin: 0;
+    font-size: var(--step-3);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .sheet__meta {
+    margin: var(--space-1) 0 0;
+    color: var(--text-2);
+    font-size: var(--step--1);
+  }
+  .sheet__x {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius-sm);
+    background: var(--ground);
+    color: var(--text);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-1) linear,
+      color var(--dur-1) linear;
+  }
+  .sheet__x:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .sheet__x svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .sheet__body {
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-5);
+  }
+
+  /* the screenshot, mounted on the ground like a plate on a sheet */
+  .sheet__plate {
+    margin: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+  .sheet__frame {
+    padding: var(--space-3);
+    background: var(--ground);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius-sm);
+  }
+  .sheet__frame :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+  }
+  .sheet__frame--tall :global(img) {
+    width: min(100%, 17rem);
+    margin-inline: auto;
+  }
+  .sheet__summary {
+    margin: 0;
+    font-family: var(--prose);
+    font-weight: 300;
+    color: var(--text-2);
+    font-size: var(--step-1);
+    line-height: 1.55;
+  }
+  .sheet__facts {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .sheet__facts div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sheet__facts dt {
+    color: var(--text-3);
+    font-size: var(--step--1);
+  }
+  .sheet__facts dd {
+    margin: 0;
+    font-weight: 500;
+    text-align: right;
+  }
+  /* the project write-up, now that it has no page of its own */
+  .sheet__prose {
+    display: grid;
+    gap: var(--space-4);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--rule);
+  }
+  .sheet__prose :global(h2) {
+    margin: var(--space-3) 0 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .sheet__prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .sheet__prose :global(p),
+  .sheet__prose :global(li) {
+    margin: 0;
+    font-family: var(--prose);
+    font-weight: 300;
+    font-size: var(--step-0);
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+  .sheet__prose :global(ul) {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+  .sheet__prose :global(li::marker) {
+    color: var(--text-3);
+  }
+  .sheet__prose :global(strong) {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .sheet__prose :global(code) {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    padding: 0.05em 0.3em;
+    background: var(--ground);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+  }
+  .sheet__prose :global(a) {
+    color: var(--accent);
+  }
+
+  .sheet__notes {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .sheet__notes p:not(.sheet__tech-label) {
+    margin: 0;
+    font-family: var(--prose);
+    font-weight: 300;
+    color: var(--text-2);
+    font-size: var(--step-0);
+    line-height: 1.6;
+  }
+  .sheet__tech-label {
+    margin: 0 0 var(--space-3);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .sheet__notes .sheet__tech-label {
+    margin-bottom: 0;
+  }
+  .sheet__tech ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sheet__tech li {
+    padding: 0.1rem 0.5rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    background: var(--ground);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-2);
+  }
+  .sheet__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .plate,
+    .plate__title,
+    .plate__visual :global(img) {
+      transition: none;
+    }
+    .plate:is(:hover, :focus-visible) {
+      transform: none;
+    }
+    .plate:is(:hover, :focus-visible) .plate__visual :global(img) {
+      transform: none;
+    }
+  }
+
+  .also {
+    margin-top: var(--space-8);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--rule-2);
+  }
+  .also__title {
+    margin: 0 0 var(--space-4);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .also__list {
+    display: grid;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+  .plate--small .plate__title {
+    font-size: var(--step-1);
+  }
+  .plate--small .plate__body {
+    padding: var(--space-4);
+  }
+</style>

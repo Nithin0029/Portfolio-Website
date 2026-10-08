@@ -1,0 +1,169 @@
+---
+import { links } from "../data/site";
+
+// Only work I have actually shipped, with the project that proves it named
+// beside each line. Nothing here is a service I haven't done.
+const services = [
+  {
+    title: "Web applications",
+    what: "React and TypeScript front ends, with a Python or Node API behind them when one is needed.",
+    evidence: "Attention Scanner, Smart ASHA Connect, T7-Logistics",
+  },
+  {
+    title: "Android apps",
+    what: "Kotlin and Jetpack Compose, offline-first on a Room database, released with an update channel.",
+    evidence: "Essential Expense Tracker, six public releases",
+  },
+  {
+    title: "Computer vision",
+    what: "Python pipelines on OpenCV and MediaPipe, with a test suite so the output can be trusted.",
+    evidence: "Attention Scanner, 24 test files",
+  },
+  {
+    title: "ESP32 and small hardware",
+    what: "C++ firmware on PlatformIO for devices that have to keep working unattended.",
+    evidence: "Study light, a mains relay that fails off",
+  },
+];
+
+const subject = "Freelance enquiry";
+// A body template, so the first message already carries what I need to answer.
+const body = [
+  "Hi Nithelan,",
+  "",
+  "What I need:",
+  "Timeline:",
+  "Budget:",
+  "",
+].join("\n");
+
+const mailto = `mailto:${links.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+// Works when no mail app is registered, which is most desktops.
+const gmail =
+  "https://mail.google.com/mail/?view=cm&fs=1" +
+  `&to=${encodeURIComponent(links.email)}` +
+  `&su=${encodeURIComponent(subject)}` +
+  `&body=${encodeURIComponent(body)}`;
+---
+
+<section class="sec wrap" id="freelance" aria-labelledby="freelance-title">
+  <header class="sec__head">
+    <h2 id="freelance-title">Freelance</h2>
+    <p>Available for freelance work alongside my degree.</p>
+  </header>
+
+  <div class="fl">
+    <div class="fl__intro sd-rise">
+      <p>
+        I take on freelance projects in the same areas I build in for myself. Every line
+        opposite is something I have shipped and can show you the code for.
+      </p>
+      <p class="fl__note">
+        Tell me what you need and the deadline you're working to, and I'll tell you
+        straight whether I can do it.
+      </p>
+
+      <div class="fl__cta" data-copy-scope>
+        <a class="btn btn--primary" href={mailto}>Start a project</a>
+        <a class="btn" href={gmail} target="_blank" rel="noopener noreferrer">Open in Gmail</a>
+        <button class="btn" type="button" data-copy={links.email}>
+          <span data-copy-label>Copy address</span>
+        </button>
+        <p class="fl__status" role="status" data-copy-status></p>
+      </div>
+    </div>
+
+    <ul class="fl__list sd-rise" role="list">
+      {
+        services.map((s) => (
+          <li>
+            <h3>{s.title}</h3>
+            <p>{s.what}</p>
+            <p class="fl__ev">{s.evidence}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .fl {
+    display: grid;
+    gap: var(--space-7);
+  }
+  @media (min-width: 60rem) {
+    .fl {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: var(--space-8);
+      align-items: start;
+    }
+  }
+
+  .fl__intro {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    max-width: 44ch;
+    font-family: var(--prose);
+    font-weight: 300;
+    font-size: var(--step-1);
+    line-height: 1.65;
+  }
+  .fl__note {
+    color: var(--text-2);
+    font-size: var(--step-0);
+  }
+  .fl__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+  .fl__status {
+    flex-basis: 100%;
+    min-height: 1.4em;
+    margin: 0;
+    color: var(--text-2);
+    font-family: var(--sans);
+    font-size: var(--step--1);
+  }
+
+  .fl__list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-2);
+  }
+  .fl__list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+    padding: var(--space-5) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .fl__list h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--step-0);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+  .fl__list p {
+    margin: 0;
+    font-family: var(--prose);
+    font-weight: 300;
+    color: var(--text-2);
+    font-size: var(--step-0);
+    line-height: 1.65;
+  }
+  .fl__list .fl__ev {
+    margin-top: var(--space-2);
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+</style>

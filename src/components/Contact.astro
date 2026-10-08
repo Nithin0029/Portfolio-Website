@@ -1,0 +1,123 @@
+---
+import { links } from "../data/site";
+
+const subject = "Hello from your portfolio";
+const mailto = `mailto:${links.email}?subject=${encodeURIComponent(subject)}`;
+const gmail =
+  "https://mail.google.com/mail/?view=cm&fs=1" +
+  `&to=${encodeURIComponent(links.email)}` +
+  `&su=${encodeURIComponent(subject)}`;
+---
+
+<section class="sec wrap" id="contact" aria-labelledby="contact-title">
+  <header class="sec__head">
+    <h2 id="contact-title">Contact</h2>
+    <p>Hiring, or want to talk about a project? Email reaches me fastest.</p>
+  </header>
+
+  <div class="contact">
+    <div class="contact__mail sd-rise" data-copy-scope>
+      <a class="contact__address" href={mailto}>{links.email}</a>
+      <div class="contact__actions">
+        <a class="btn btn--primary" href={mailto}>Write an email</a>
+        <a class="btn" href={gmail} target="_blank" rel="noopener noreferrer">Open in Gmail</a>
+        <button class="btn" type="button" data-copy={links.email}>
+          <span data-copy-label>Copy address</span>
+        </button>
+        <p class="contact__status" role="status" data-copy-status></p>
+      </div>
+    </div>
+
+    <ul class="contact__links sd-rise" role="list">
+      <li>
+        <a href={links.github}>
+          <span>GitHub</span>
+          <span class="contact__handle">@{links.githubHandle}</span>
+        </a>
+      </li>
+      <li>
+        <a href={links.linkedin}>
+          <span>LinkedIn</span>
+          <span class="contact__handle">Nithelan Jayakumar</span>
+        </a>
+      </li>
+      <li>
+        <a href={links.resume}>
+          <span>Résumé</span>
+          <span class="contact__handle">PDF, {links.resumeSize}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .contact {
+    display: grid;
+    gap: var(--space-7);
+  }
+  @media (min-width: 60rem) {
+    .contact {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      column-gap: var(--space-8);
+      align-items: end;
+    }
+  }
+
+  .contact__address {
+    display: inline-block;
+    font-family: var(--display);
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: clamp(1.3rem, 0.4rem + 2.4vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    border-bottom: 1px solid var(--rule-2);
+    transition: border-color var(--dur-1) linear;
+  }
+  .contact__address:hover {
+    border-color: currentColor;
+  }
+  .contact__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+  .contact__status {
+    color: var(--text-2);
+    font-size: var(--step--1);
+    min-width: 1px;
+  }
+
+  .contact__links {
+    border: 1px solid var(--rule-2);
+    background: var(--raised);
+  }
+  .contact__links a {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+    min-height: 3.25rem;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--rule);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .contact__links li:last-child a {
+    border-bottom: 0;
+  }
+  .contact__links a:hover {
+    color: var(--accent);
+  }
+  .contact__handle {
+    color: var(--text-2);
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.8125rem;
+  }
+</style>

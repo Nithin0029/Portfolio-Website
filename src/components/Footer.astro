@@ -1,0 +1,36 @@
+---
+import { person, links } from "../data/site";
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="foot__inner wrap">
+    <p>© {year} {person.name}</p>
+    <p>
+      Built with Astro. Source on{" "}
+      <a href={`${links.github}/Portfolio-Website`}>GitHub</a>.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    margin-top: var(--space-9);
+    border-top: 1px solid var(--rule);
+    color: var(--text-3);
+    font-size: var(--step--1);
+  }
+  .foot__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
+    padding-block: var(--space-6);
+  }
+  .foot a {
+    color: var(--text-2);
+  }
+  .foot a:hover {
+    color: var(--text);
+  }
+</style>

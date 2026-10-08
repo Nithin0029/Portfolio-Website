@@ -1,0 +1,422 @@
+---
+import { nav, person } from "../data/site";
+---
+
+<header class="bar" data-bar transition:persist>
+  <div class="bar__inner wrap">
+    <a class="bar__home" href="/" aria-label={`${person.name}, home`}>
+      <span aria-hidden="true">{person.name}</span>
+    </a>
+
+    <button
+      class="bar__menu-btn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      data-menu-button
+    >
+      <span class="visually-hidden">Menu</span>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path class="open" d="M3 6h14M3 14h14" /><path class="close" d="M4 4l12 12M4 16L16 4" /></svg>
+    </button>
+
+    <nav class="bar__nav" id="site-nav" aria-label="Main" data-menu>
+      <ul role="list" data-nav-list>
+        <span class="bar__ind" data-nav-ind aria-hidden="true"></span>
+        {
+          nav.map((item, i) => (
+            <li style={`--i:${i}`}>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="bar__tools">
+        <button class="bar__theme" type="button" data-theme-toggle aria-pressed="false">
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="6.5" />
+            <path d="M10 3.5a6.5 6.5 0 0 1 0 13z" class="fill" />
+          </svg>
+          <span>Light theme</span>
+        </button>
+        <a class="btn btn--primary bar__cta" href="/#contact">Contact</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const setup = () => {
+    const btn = document.querySelector<HTMLButtonElement>("[data-menu-button]");
+    const menu = document.querySelector<HTMLElement>("[data-menu]");
+    const toggle = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+    if (!btn || !menu || !toggle) return;
+
+    // --- mobile menu ---
+    const setOpen = (open: boolean) => {
+      btn.setAttribute("aria-expanded", String(open));
+      menu.dataset.open = String(open);
+    };
+    btn.onclick = () => setOpen(btn.getAttribute("aria-expanded") !== "true");
+    menu.onclick = (e) => {
+      if ((e.target as HTMLElement).closest("a")) setOpen(false);
+    };
+    document.onkeydown = (e) => {
+      if (e.key === "Escape" && btn.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+        btn.focus();
+      }
+    };
+
+    // --- compact the bar once the page has moved ---
+    const bar = document.querySelector<HTMLElement>("[data-bar]");
+    if (bar) {
+      const mark = () => {
+        bar.dataset.scrolled = String(window.scrollY > 48);
+      };
+      mark();
+      window.addEventListener("scroll", mark, { passive: true });
+    }
+
+    // --- active section, with an indicator that slides between links ---
+    const list = document.querySelector<HTMLElement>("[data-nav-list]");
+    const ind = document.querySelector<HTMLElement>("[data-nav-ind]");
+    const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-nav-list] a")];
+    const targets = links
+      .map((a) => {
+        const id = (a.getAttribute("href") ?? "").split("#")[1];
+        return id ? { a, el: document.getElementById(id) } : null;
+      })
+      .filter((t): t is { a: HTMLAnchorElement; el: HTMLElement } => !!t?.el);
+
+    if (list && ind && targets.length) {
+      let active: HTMLAnchorElement | null = null;
+
+      // The indicator is measured, so it must never be positioned while the
+      // list is the stacked mobile panel — a full-width link would stretch it.
+      const place = () => {
+        if (!active || getComputedStyle(list).display === "none" || window.innerWidth < 832) {
+          ind.style.opacity = "0";
+          return;
+        }
+        const l = active.getBoundingClientRect();
+        const u = list.getBoundingClientRect();
+        ind.style.width = `${l.width}px`;
+        ind.style.transform = `translateX(${l.left - u.left}px)`;
+        ind.style.opacity = "1";
+      };
+
+      const setActive = (a: HTMLAnchorElement | null) => {
+        if (a === active) return;
+        links.forEach((l) => l.removeAttribute("aria-current"));
+        active = a;
+        if (a) a.setAttribute("aria-current", "true");
+        place();
+      };
+
+      const seen = new Map<Element, number>();
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => seen.set(e.target, e.isIntersecting ? e.intersectionRatio : 0));
+          let bestLink: HTMLAnchorElement | null = null;
+          let bestRatio = 0;
+          for (const { a, el } of targets) {
+            const r = seen.get(el) ?? 0;
+            if (r > bestRatio) {
+              bestRatio = r;
+              bestLink = a;
+            }
+          }
+          setActive(bestLink);
+        },
+        { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.01, 0.5, 1] },
+      );
+      targets.forEach(({ el }) => io.observe(el));
+      window.addEventListener("resize", place, { passive: true });
+    }
+
+    // --- theme ---
+    const root = document.documentElement;
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+    // Until a choice is stored, data-theme is unset and the page follows the
+    // system. Reading the attribute alone would mean the first click computes
+    // the theme already showing, so on a light system nothing would happen.
+    const current = () => root.dataset.theme ?? (prefersDark.matches ? "dark" : "light");
+
+    const sync = () => {
+      const light = current() === "light";
+      toggle.setAttribute("aria-pressed", String(light));
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute("content", light ? "#e7e9e5" : "#15181a");
+    };
+
+    toggle.onclick = () => {
+      const next = current() === "light" ? "dark" : "light";
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem("theme", next);
+      } catch {}
+      sync();
+    };
+
+    // follow the system while the visitor has not chosen for themselves
+    prefersDark.addEventListener("change", () => {
+      if (!root.dataset.theme) sync();
+    });
+
+    sync();
+  };
+
+  // The header persists across view transitions; re-run after each swap so
+  // the handlers are bound to the current document.
+  document.addEventListener("astro:page-load", setup);
+</script>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+  }
+  /* reading progress: a hairline under the bar that fills as the page scrolls */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .bar::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 1px;
+        background: var(--accent);
+        transform-origin: left;
+        animation: bar-progress linear both;
+        animation-timeline: scroll(root block);
+      }
+      @keyframes bar-progress {
+        from {
+          transform: scaleX(0);
+        }
+      }
+    }
+  }
+  .bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    min-height: 3.75rem;
+    transition: min-height var(--dur-2) var(--ease-out);
+  }
+  /* once the page has moved, the bar gives its height back to the content */
+  .bar[data-scrolled="true"] .bar__inner {
+    min-height: 3rem;
+  }
+  .bar[data-scrolled="true"] {
+    border-bottom-color: var(--rule-2);
+  }
+  /* Wide: three tracks, so the section links sit centred on the bar with the
+     name and the tools balanced either side of them. */
+  @media (min-width: 52rem) {
+    .bar__inner {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+    }
+    .bar__tools {
+      justify-self: end;
+    }
+  }
+
+  .bar__home {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    letter-spacing: 0;
+    text-decoration: none;
+    white-space: nowrap;
+    padding-block: var(--space-2);
+  }
+
+  .bar__nav ul {
+    position: relative;
+    display: flex;
+    gap: var(--space-1);
+  }
+  /* the rule under the section you are in, sliding between links */
+  .bar__ind {
+    position: absolute;
+    left: 0;
+    bottom: 0.35rem;
+    height: 2px;
+    width: 0;
+    opacity: 0;
+    background: var(--accent);
+    pointer-events: none;
+    transition:
+      transform var(--dur-3) var(--ease-out),
+      width var(--dur-3) var(--ease-out),
+      opacity var(--dur-2) linear;
+  }
+  .bar__nav a[aria-current] {
+    color: var(--text);
+  }
+  .bar__nav a:not(.btn) {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3em;
+    min-height: 2.75rem;
+    align-items: center;
+    padding-inline: var(--space-3);
+    color: var(--text-2);
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: color var(--dur-1) linear;
+  }
+  .bar__nav a:not(.btn):hover {
+    color: var(--text);
+  }
+  .bar__tools {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .bar__theme {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    padding: 0 var(--space-3);
+    background: none;
+    border: 0;
+    color: var(--text-2);
+    font-size: 0.9375rem;
+    cursor: pointer;
+  }
+  .bar__theme:hover {
+    color: var(--text);
+  }
+  .bar__theme svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+  .bar__theme .fill {
+    fill: currentColor;
+    stroke: none;
+  }
+  .bar__theme[aria-pressed="true"] .fill {
+    transform: rotate(180deg);
+    transform-origin: 10px 10px;
+  }
+  .bar__cta {
+    min-height: 2.5rem;
+    padding-inline: var(--space-4);
+  }
+
+  .bar__menu-btn {
+    display: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: calc(-1 * var(--space-3));
+    background: none;
+    border: 0;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .bar__menu-btn svg {
+    width: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+  .bar__menu-btn .close,
+  .bar__menu-btn[aria-expanded="true"] .open {
+    display: none;
+  }
+  .bar__menu-btn[aria-expanded="true"] .close {
+    display: inline;
+  }
+
+  /* Wide: the nav wrapper steps out of the layout so its list and its tools
+     become grid items in their own right. */
+  @media (min-width: 52rem) {
+    .bar__nav {
+      display: contents;
+    }
+    .bar__nav ul {
+      justify-content: center;
+    }
+  }
+
+  /* Narrow: disclosure panel under the bar. */
+  @media (max-width: 51.99rem) {
+    .bar__menu-btn {
+      display: grid;
+    }
+    .bar__ind {
+      display: none;
+    }
+    .bar__nav {
+      display: none;
+      position: absolute;
+      inset: 100% 0 auto 0;
+      padding: var(--space-2) var(--gutter) var(--space-5);
+      background: var(--ground);
+      border-bottom: 1px solid var(--rule-2);
+      box-shadow: var(--lift);
+    }
+    .bar__nav[data-open="true"] {
+      display: block;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .bar__nav[data-open="true"] {
+        animation: panel-in var(--dur-3) var(--ease-out);
+      }
+      /* the links arrive in order, as if the panel is being drawn */
+      .bar__nav[data-open="true"] li {
+        animation: row-in var(--dur-3) var(--ease-out) both;
+        animation-delay: calc(var(--i, 0) * 45ms + 60ms);
+      }
+      .bar__nav[data-open="true"] .bar__tools {
+        animation: row-in var(--dur-3) var(--ease-out) both;
+        animation-delay: 260ms;
+      }
+    }
+    @keyframes panel-in {
+      from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+      }
+    }
+    @keyframes row-in {
+      from {
+        opacity: 0;
+        transform: translateY(-0.4rem);
+      }
+    }
+    .bar__nav ul {
+      flex-direction: column;
+      gap: 0;
+    }
+    .bar__nav a:not(.btn) {
+      display: flex;
+      padding-inline: 0;
+      font-size: var(--step-1);
+      color: var(--text);
+      border-bottom: 1px solid var(--rule);
+    }
+    .bar__tools {
+      justify-content: space-between;
+      margin-top: var(--space-4);
+    }
+    .bar__theme {
+      padding-inline: 0;
+    }
+  }
+</style>

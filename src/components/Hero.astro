@@ -1,0 +1,166 @@
+---
+import { links } from "../data/site";
+
+---
+
+<section class="sheet" aria-labelledby="hero-name">
+  <div class="sheet__field wrap">
+    <span class="reg reg--tl" aria-hidden="true"></span>
+    <span class="reg reg--tr" aria-hidden="true"></span>
+    <span class="reg reg--bl" aria-hidden="true"></span>
+    <span class="reg reg--br" aria-hidden="true"></span>
+
+    <div class="hero">
+      <h1 class="hero__name" id="hero-name">
+        <span class="hero__given">Nithelan</span>
+        <span class="hero__family">
+          <span class="hero__detail">Jayakumar</span>
+        </span>
+      </h1>
+
+      <p class="hero__line">
+        I pick the problem, choose the stack, and stay with it after it first works.
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="/#work">See the work</a>
+        <a class="btn" href={links.resume}>
+          Résumé
+          <span class="hero__meta">PDF, {links.resumeSize}</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* The sheet: drafting paper with a faint grid, ruled at its edges. */
+  .sheet {
+    background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 1.5rem 1.5rem;
+    background-position: center top;
+  }
+
+  .sheet__field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    padding-block: var(--space-8) var(--space-9);
+  }
+
+  /* registration marks, as on a plate that has to line up */
+  .reg {
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1px solid var(--rule-2);
+    pointer-events: none;
+  }
+  .reg--tl {
+    top: var(--space-4);
+    left: calc(var(--gutter) * -0.5);
+    border-right: 0;
+    border-bottom: 0;
+  }
+  .reg--tr {
+    top: var(--space-4);
+    right: calc(var(--gutter) * -0.5);
+    border-left: 0;
+    border-bottom: 0;
+  }
+  .reg--bl {
+    bottom: var(--space-4);
+    left: calc(var(--gutter) * -0.5);
+    border-right: 0;
+    border-top: 0;
+  }
+  .reg--br {
+    bottom: var(--space-4);
+    right: calc(var(--gutter) * -0.5);
+    border-left: 0;
+    border-top: 0;
+  }
+
+  .hero {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .hero__name {
+    margin: 0;
+    display: grid;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: var(--step-5);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .hero__given {
+    color: var(--text);
+  }
+  .hero__family {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  /* the detail box: the schematic's way of saying "look here" */
+  .hero__detail {
+    position: relative;
+    padding: 0.06em 0.12em;
+    margin-left: -0.12em;
+    outline: 1px dashed var(--accent);
+    outline-offset: 0.06em;
+    color: var(--text);
+  }
+
+  .hero__line {
+    max-width: 34ch;
+    margin: 0;
+    font-family: var(--prose);
+    font-weight: 300;
+    font-size: clamp(1.15rem, 0.95rem + 0.9vw, 1.6rem);
+    line-height: 1.45;
+    color: var(--text-2);
+    text-wrap: pretty;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+  .hero__meta {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+
+  /* One orchestrated moment: the sheet is annotated once, the way a drawing
+     gets marked up. Nothing moves after that. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__detail {
+      animation: mark var(--dur-3) var(--ease-out) 520ms both;
+    }
+    .reg {
+      animation: ink 240ms linear 300ms both;
+    }
+  }
+  @keyframes mark {
+    from {
+      outline-color: transparent;
+    }
+  }
+  @keyframes ink {
+    from {
+      opacity: 0;
+    }
+  }
+</style>

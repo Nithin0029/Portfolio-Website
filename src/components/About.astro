@@ -1,0 +1,102 @@
+---
+import { person } from "../data/site";
+---
+
+<section class="sec wrap" id="about" aria-labelledby="about-title">
+  <header class="sec__head">
+    <h2 id="about-title">About</h2>
+    <p>Computer science student, building real software while I study.</p>
+  </header>
+
+  <div class="about">
+    <div class="about__text sd-rise">
+      <p>
+        I'm in the seventh semester of a {person.degree} at {person.institution} in Bengaluru,
+        with a CGPA of {person.cgpa}. Most of what I know came from building projects end to
+        end: picking the problem, choosing the stack, and staying with it after it first works
+        on my machine.
+      </p>
+      <p>
+        That has meant writing a test suite for a computer-vision pipeline because its output
+        was too noisy to trust by eye, and building an update channel into an Android app so
+        people would actually receive the fixes. The overlap between machine learning and
+        software that has to run reliably is where I want to work.
+      </p>
+      <p>
+        Five hackathon placements taught me to cut scope and ship under a deadline. I came
+        back to one of those weekend builds, Attention Scanner, and rebuilt it as a tested
+        pipeline.
+      </p>
+      <p>
+        I'm looking for an internship or entry-level role where my code gets reviewed
+        properly and I can keep learning from experienced engineers. I also take on
+        freelance work.
+      </p>
+    </div>
+
+    <dl class="about__facts sd-rise">
+      <div><dt>Degree</dt><dd>{person.degree}</dd></div>
+      <div><dt>Institution</dt><dd>{person.institution}</dd></div>
+      <div><dt>Years</dt><dd>{person.years}, {person.semester}</dd></div>
+      <div><dt>CGPA</dt><dd class="num">{person.cgpa}</dd></div>
+      <div><dt>Based in</dt><dd>{person.location}</dd></div>
+      <div><dt>Open to</dt><dd>Internships, entry-level roles, freelance</dd></div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--space-7);
+  }
+  @media (min-width: 60rem) {
+    .about {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      column-gap: var(--space-8);
+      align-items: start;
+    }
+  }
+  .about__text {
+    display: grid;
+    gap: var(--space-4);
+    max-width: var(--measure);
+    font-family: var(--prose);
+    font-weight: 300;
+    font-size: var(--step-1);
+    line-height: 1.7;
+  }
+  .about__text p:not(:first-child) {
+    color: var(--text-2);
+  }
+
+  /* the specification block: what this drawing is of */
+  .about__facts {
+    display: grid;
+    border: 1px solid var(--rule-2);
+    background: var(--raised);
+  }
+  .about__facts div {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--rule);
+  }
+  .about__facts div:last-child {
+    border-bottom: 0;
+  }
+  .about__facts dt {
+    color: var(--text-3);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding-top: 0.25em;
+  }
+  .about__facts dd {
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+</style>

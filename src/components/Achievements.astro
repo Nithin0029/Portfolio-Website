@@ -1,0 +1,248 @@
+---
+import { placements } from "../data/journey";
+import { person } from "../data/site";
+
+// A drawing carries a revision block: what changed, when, and to what effect.
+// Five placements and the degree they sit on are exactly that, so each entry is
+// a revision plate. They genuinely are a numbered chronological sequence, so the
+// numbering is information rather than decoration.
+interface Row {
+  rev: string;
+  date: string;
+  when: string;
+  event: string;
+  where: string;
+  built: string;
+  result: string;
+  first?: boolean;
+  repo?: { label: string; href: string };
+  project?: { label: string; href: string };
+}
+
+const start = {
+  date: "2023",
+  when: "2023",
+  event: `Started a ${person.degree}`,
+  where: `${person.institution}, Bengaluru`,
+  built: `Graduating 2027. Currently in the ${person.semester}, with a CGPA of ${person.cgpa}.`,
+  result: "In progress",
+};
+
+// revision numbers run with the chronology, then the track reads newest first
+const rows: Row[] = [start, ...[...placements].reverse()]
+  .map((e, i) => ({ ...e, rev: String(i).padStart(2, "0") }))
+  .reverse();
+
+// The pinned pan needs to know how wide the track is before it renders, so the
+// card width and gap are fixed here and the CSS derives the distance from them.
+const CARD = 21;
+const GAP = 1;
+const trackWidth = rows.length * CARD + (rows.length - 1) * GAP;
+---
+
+<section
+  class="jr"
+  id="achievements"
+  aria-labelledby="achievements-title"
+  style={`--track-w:${trackWidth}rem; --card:${CARD}rem; --gap:${GAP}rem`}
+>
+  <div class="jr__pin">
+    <div class="wrap">
+      <header class="sec__head">
+        <h2 id="achievements-title">Achievements</h2>
+        <p>Five placements in six months. I got good at cutting scope.</p>
+      </header>
+
+      <p class="jr__hint" id="jr-hint">
+        <span class="num">{rows.length} revisions</span>
+        <span>Newest first</span>
+      </p>
+
+      <ol class="jr__track" role="list" tabindex="0" aria-labelledby="achievements-title" aria-describedby="jr-hint">
+        {
+          rows.map((r) => (
+            <li class:list={["jr__card", { "jr__card--first": r.first }]}>
+              <p class="jr__tab">
+                <span class="jr__n num">Rev {r.rev}</span>
+                <time class="jr__when num" datetime={r.date}>
+                  {r.when}
+                </time>
+              </p>
+
+              <p class="jr__result">{r.result}</p>
+              <h3 class="jr__event">{r.event}</h3>
+              <p class="jr__where">{r.where}</p>
+              <p class="jr__built">{r.built}</p>
+
+              {(r.repo || r.project) && (
+                <p class="jr__links">
+                  {r.repo && (
+                    <a class="link ext" href={r.repo.href}>
+                      {r.repo.label}
+                    </a>
+                  )}
+                  {r.project && (
+                    <a class="link" href={r.project.href}>
+                      {r.project.label}
+                    </a>
+                  )}
+                </p>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .jr {
+    padding-top: var(--space-9);
+  }
+
+  .jr__hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    margin: 0 0 var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--rule-2);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* Default, and the fallback everywhere the pinned pan cannot run: a plain
+     horizontal scroller that works with touch, a trackpad and the keyboard. */
+  .jr__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(var(--card), 78vw);
+    gap: var(--gap);
+    margin: 0;
+    padding: 0 0 var(--space-4);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+  .jr__track:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .jr__card {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    scroll-snap-align: start;
+    background: var(--raised);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius);
+    box-shadow: var(--lift);
+  }
+
+  .jr__tab {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+  .jr__card--first .jr__n {
+    color: var(--accent);
+  }
+
+  .jr__result {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-2);
+  }
+  /* the one first prize is the only thing here worth a colour */
+  .jr__card--first .jr__result {
+    color: var(--accent);
+  }
+
+  .jr__event {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  .jr__where {
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--step--1);
+  }
+  .jr__built {
+    margin: var(--space-1) 0 0;
+    font-family: var(--prose);
+    font-weight: 300;
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+  .jr__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin: var(--space-2) 0 0;
+    font-size: var(--step--1);
+  }
+
+  /* ----------------------------------------------------------------
+     Pinned pan. The section is made taller than the viewport by exactly
+     the distance the track has to travel, so scrolling down holds the
+     section still and walks the cards sideways; when the track runs out,
+     the page carries on. It is driven by a scroll timeline, so it runs on
+     the compositor with no scroll listener.
+     ---------------------------------------------------------------- */
+  @supports (animation-timeline: view()) {
+    @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+      .jr {
+        /* what the content column is actually wide */
+        --inner: min(100vw - 2 * var(--gutter), var(--page));
+        --pan: max(0rem, var(--track-w) - var(--inner));
+        height: calc(100svh + var(--pan));
+        padding-top: 0;
+        view-timeline-name: --jr;
+        view-timeline-axis: block;
+      }
+      .jr__pin {
+        position: sticky;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100svh;
+        overflow: hidden;
+      }
+      .jr__track {
+        /* the pan replaces the scrollbar, so the track no longer scrolls */
+        overflow: visible;
+        padding-bottom: 0;
+        animation: jr-pan linear both;
+        animation-timeline: --jr;
+        animation-range: contain 0% contain 100%;
+      }
+      @keyframes jr-pan {
+        to {
+          transform: translateX(calc(-1 * var(--pan)));
+        }
+      }
+    }
+  }
+</style>

@@ -1,0 +1,124 @@
+---
+import { ClientRouter } from "astro:transitions";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { person, links } from "../data/site";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description: string;
+  image?: string;
+}
+
+const { title, description, image = "/og.png" } = Astro.props;
+const pageTitle = title ? `${title} | ${person.name}` : `${person.name} | Computer vision, Android and ML`;
+// build.format is "file", so strip ".html" and "/index" to match the clean URLs Vercel serves.
+const path = Astro.url.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
+const canonical = new URL(path, Astro.site);
+// public/og.png is rendered from the site fonts and commit data (see docs).
+const ogImage = image ? new URL(image, Astro.site) : undefined;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: person.name,
+  description: "Computer science student building computer vision, Android and machine learning software.",
+  email: `mailto:${links.email}`,
+  url: Astro.site?.href,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Bengaluru",
+    addressRegion: "Karnataka",
+    addressCountry: "IN",
+  },
+  alumniOf: { "@type": "CollegeOrUniversity", name: person.institution },
+  knowsAbout: ["Computer vision", "Machine learning", "Android development"],
+  sameAs: [links.github, links.linkedin],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- kept in step with the effective theme by the header script -->
+    <meta name="theme-color" content="#e7e9e5" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+
+    <link rel="preload" href="/fonts/ibm-plex-sans-condensed-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <script is:inline>
+      // Runs before first paint, and again after every client-side navigation,
+      // so the chosen theme never flashes.
+      const applyTheme = (doc) => {
+        try {
+          const t = localStorage.getItem("theme");
+          if (t === "light" || t === "dark") doc.documentElement.dataset.theme = t;
+        } catch {}
+      };
+      applyTheme(document);
+      document.addEventListener("astro:before-swap", (e) => applyTheme(e.newDocument));
+    </script>
+
+    <ClientRouter fallback="none" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Every [data-copy] control on the page, each updating its own label and
+      // its own status line. mailto: depends on the visitor having a mail app
+      // registered, which many desktops do not — so copying the address is a
+      // first-class action here, not a fallback.
+      const setupCopy = () => {
+        document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+          const scope = btn.closest("[data-copy-scope]") ?? document;
+          const label = scope.querySelector<HTMLElement>("[data-copy-label]");
+          const status = scope.querySelector<HTMLElement>("[data-copy-status]");
+          let timer = 0;
+          btn.addEventListener("click", async () => {
+            const address = btn.dataset.copy ?? "";
+            let ok = true;
+            try {
+              await navigator.clipboard.writeText(address);
+            } catch {
+              ok = false;
+            }
+            if (label) label.textContent = ok ? "Copied" : "Copy address";
+            if (status) {
+              status.textContent = ok
+                ? `${address} copied to the clipboard.`
+                : `Couldn't copy. The address is ${address}.`;
+            }
+            clearTimeout(timer);
+            timer = window.setTimeout(() => {
+              if (label) label.textContent = "Copy address";
+              if (status) status.textContent = "";
+            }, 4000);
+          });
+        });
+      };
+      document.addEventListener("astro:page-load", setupCopy);
+    </script>
+  </body>
+</html>
