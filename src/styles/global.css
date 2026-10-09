@@ -158,6 +158,10 @@
   .btn:hover {
     border-color: var(--text);
   }
+  /* a control that does not acknowledge the press feels broken */
+  .btn:active {
+    transform: translateY(1px);
+  }
   .btn--primary {
     background: var(--fill);
     border-color: var(--fill);
@@ -171,6 +175,21 @@
     width: 1rem;
     height: 1rem;
     flex: none;
+  }
+
+  /* Only while the theme is being switched: the whole page crosses over
+     rather than snapping. The class is removed as soon as it has run, so
+     nothing else on the page inherits a colour transition. */
+  html.theme-shift,
+  html.theme-shift *,
+  html.theme-shift *::before,
+  html.theme-shift *::after {
+    transition:
+      background-color 260ms linear,
+      border-color 260ms linear,
+      color 260ms linear,
+      outline-color 260ms linear,
+      fill 260ms linear !important;
   }
 
   /* Home-page sections: heading on a rule, optional one-line context beside it. */

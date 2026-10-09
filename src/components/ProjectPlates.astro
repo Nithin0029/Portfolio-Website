@@ -57,7 +57,7 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
   <ul class="plates" role="list">
     {
       projects.map(({ id, data }, i) => (
-        <li>
+        <li style={`--i:${i}`}>
           <button class="plate" type="button" data-opens={`d-${id}`} aria-haspopup="dialog">
             <span class="plate__tab">
               <span class="plate__fig">Fig. {fig(i)}</span>
@@ -490,26 +490,42 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
     overflow: auto;
     overscroll-behavior: contain;
   }
-  .sheet::backdrop {
-    background: rgb(20 23 26 / 0.62);
+  /* Opening was animated and closing was not, so the dialog arrived
+     deliberately and then vanished. Both ends are transitions now, which
+     needs the overlay and display properties to animate discretely. */
+  .sheet {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+    transition:
+      opacity var(--dur-3) var(--ease-out),
+      transform var(--dur-3) var(--ease-out),
+      overlay var(--dur-3) var(--ease-out) allow-discrete,
+      display var(--dur-3) var(--ease-out) allow-discrete;
+  }
+  .sheet[open] {
+    opacity: 1;
+    transform: none;
+  }
+  @starting-style {
+    .sheet[open] {
+      opacity: 0;
+      transform: translateY(14px) scale(0.985);
+    }
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .sheet[open] {
-      animation: sheet-in var(--dur-3) var(--ease-out);
-    }
+  .sheet::backdrop {
+    background: rgb(20 23 26 / 0.62);
+    opacity: 0;
+    transition:
+      opacity var(--dur-3) var(--ease-out),
+      overlay var(--dur-3) var(--ease-out) allow-discrete,
+      display var(--dur-3) var(--ease-out) allow-discrete;
+  }
+  .sheet[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
     .sheet[open]::backdrop {
-      animation: scrim-in var(--dur-3) var(--ease-out);
-    }
-  }
-  @keyframes sheet-in {
-    from {
-      opacity: 0;
-      transform: translateY(14px) scale(0.98);
-    }
-  }
-  @keyframes scrim-in {
-    from {
       opacity: 0;
     }
   }
@@ -736,6 +752,25 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
     }
     .plate:is(:hover, :focus-visible) .plate__visual :global(img) {
       transform: none;
+    }
+  }
+
+  /* The plates are laid down one after another as the section comes up.
+     The stagger is in the range rather than a delay, because a scroll
+     timeline has no clock to delay against. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .plates > li {
+        animation: plate-in linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry calc(240px + var(--i, 0) * 90px);
+      }
+      @keyframes plate-in {
+        from {
+          opacity: 0;
+          transform: translateY(1.75rem);
+        }
+      }
     }
   }
 

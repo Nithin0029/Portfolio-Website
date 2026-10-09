@@ -12,9 +12,9 @@ import { links } from "../data/site";
 
     <div class="hero">
       <h1 class="hero__name" id="hero-name">
-        <span class="hero__given">Nithelan</span>
+        <span class="hero__given"><span>Nithelan</span></span>
         <span class="hero__family">
-          <span class="hero__detail">Jayakumar</span>
+          <span class="hero__detail"><span>Jayakumar</span></span>
         </span>
       </h1>
 
@@ -143,14 +143,51 @@ import { links } from "../data/site";
     color: var(--text-3);
   }
 
-  /* One orchestrated moment: the sheet is annotated once, the way a drawing
-     gets marked up. Nothing moves after that. */
+  /* One orchestrated moment, in the order a drawing is made: the sheet is
+     ruled, the name is lettered a line at a time, then it is annotated.
+     Nothing moves after it has run. */
+  .hero__given,
+  .hero__detail {
+    overflow: hidden;
+  }
+  .hero__given > span,
+  .hero__detail > span {
+    display: inline-block;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    .hero__detail {
-      animation: mark var(--dur-3) var(--ease-out) 520ms both;
+    .sheet {
+      animation: ink 600ms linear both;
+    }
+    .hero__given > span {
+      animation: letter 760ms var(--ease-out) 120ms both;
+    }
+    .hero__detail > span {
+      animation: letter 760ms var(--ease-out) 240ms both;
+    }
+    .hero__line {
+      animation: lift 640ms var(--ease-out) 520ms both;
+    }
+    .hero__actions {
+      animation: lift 640ms var(--ease-out) 640ms both;
     }
     .reg {
-      animation: ink 240ms linear 300ms both;
+      animation: ink 320ms linear 820ms both;
+    }
+    .hero__detail {
+      animation: mark 420ms var(--ease-out) 980ms both;
+    }
+  }
+
+  @keyframes letter {
+    from {
+      transform: translateY(105%);
+    }
+  }
+  @keyframes lift {
+    from {
+      opacity: 0;
+      transform: translateY(0.6rem);
     }
   }
   @keyframes mark {

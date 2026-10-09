@@ -151,8 +151,15 @@ import { nav, person } from "../data/site";
         ?.setAttribute("content", light ? "#e7e9e5" : "#15181a");
     };
 
+    let shift = 0;
     toggle.onclick = () => {
       const next = current() === "light" ? "dark" : "light";
+      // the crossfade is scoped to the switch itself, never left on the page
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        root.classList.add("theme-shift");
+        clearTimeout(shift);
+        shift = window.setTimeout(() => root.classList.remove("theme-shift"), 320);
+      }
       root.dataset.theme = next;
       try {
         localStorage.setItem("theme", next);
