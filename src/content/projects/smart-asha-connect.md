@@ -20,8 +20,6 @@ facts:
     source: backend/llm/llama_runtime.py runs it through Ollama
 technologies: [React, TypeScript, Vite, PWA, Python, Ollama]
 links:
-  - label: Source on GitHub
-    href: https://github.com/Nithin0029/ASHA-AI
   - label: Live demo
     href: https://asha-ai-nine.vercel.app/
 ---
