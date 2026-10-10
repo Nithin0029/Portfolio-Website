@@ -15,7 +15,7 @@ const gmail =
     <p>Hiring, or want to talk about a project? Email reaches me fastest.</p>
   </header>
 
-  <div class="contact">
+  <div class="contact split">
     <div class="contact__mail sd-rise" data-copy-scope>
       <p class="contact__status-line">
         <span class="contact__dot" aria-hidden="true"></span>
@@ -64,17 +64,6 @@ const gmail =
 </section>
 
 <style>
-  .contact {
-    display: grid;
-    gap: var(--space-7);
-  }
-  @media (min-width: 60rem) {
-    .contact {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      column-gap: var(--space-8);
-      align-items: start;
-    }
-  }
 
   .contact__mail {
     display: grid;

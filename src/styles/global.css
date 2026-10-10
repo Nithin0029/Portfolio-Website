@@ -329,15 +329,29 @@
     border-top: 1px solid var(--rule-2);
     margin-bottom: var(--space-7);
   }
-  @media (min-width: 56rem) {
-    .sec__head {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
-      align-items: baseline;
-      column-gap: var(--space-7);
-    }
-  }
   .sec__head {
     margin-bottom: var(--space-8);
+  }
+
+  /* One split for every two-column block on the page, heads included, so the
+     right-hand column begins at the same x all the way down. Three different
+     ratios were in use and the edge moved at every section. */
+  .split {
+    display: grid;
+    gap: var(--space-7);
+  }
+  @media (min-width: 60rem) {
+    .sec__head,
+    .split {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+      column-gap: var(--space-7);
+    }
+    .sec__head {
+      align-items: baseline;
+    }
+    .split {
+      align-items: start;
+    }
   }
   .sec__head h2 {
     font-size: var(--step-4);

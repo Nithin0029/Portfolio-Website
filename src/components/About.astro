@@ -8,7 +8,7 @@ import { person } from "../data/site";
     <p>Computer science student, building real software while I study.</p>
   </header>
 
-  <div class="about">
+  <div class="about split">
     <div class="about__text sd-rise">
       <p>
         I'm in the seventh semester of a {person.degree} at {person.institution} in Bengaluru,
@@ -46,17 +46,6 @@ import { person } from "../data/site";
 </section>
 
 <style>
-  .about {
-    display: grid;
-    gap: var(--space-7);
-  }
-  @media (min-width: 60rem) {
-    .about {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      column-gap: var(--space-8);
-      align-items: start;
-    }
-  }
   .about__text {
     display: grid;
     gap: var(--space-4);
