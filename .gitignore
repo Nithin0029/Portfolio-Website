@@ -59,7 +59,14 @@ pnpm-debug.log*
 coverage/
 .nyc_output/
 
-# Contains patient names, addresses and Aadhaar numbers — must never be published
-assets/img/asha-connect.png
+# Build info
+*.tsbuildinfo
 
+# Working notes, not part of the published site
 docs/
+
+# Patient names, addresses and Aadhaar numbers. Matched by filename rather
+# than by path, so it stays ignored if it is ever moved in beside the other
+# images — a path-anchored rule only covered it where it happens to sit.
+asha-connect.png
+asha-connect.*
