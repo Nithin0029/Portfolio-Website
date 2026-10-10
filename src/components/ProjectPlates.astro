@@ -88,36 +88,62 @@ const others: Other[] = [
 ];
 
 const fig = (i: number) => String(i + 1).padStart(2, "0");
+
+// The case studies and the repository builds are all projects; they differ
+// only in whether a write-up exists for them, which the dialog handles.
+const plates = [
+  ...projects.map(({ id, data }) => ({
+    id,
+    kind: data.kind,
+    title: data.title,
+    summary: data.summary,
+    technologies: data.technologies,
+    cover: data.cover,
+    phones: data.cover?.shape === "phones" ? data.gallery.slice(0, 2) : null,
+    facts: data.facts,
+  })),
+  ...others.map((o) => ({
+    id: o.id,
+    kind: o.kind,
+    title: o.title,
+    summary: o.summary,
+    technologies: o.technologies,
+    // the first drawing or screenshot stands in for the cover
+    cover: o.gallery?.find((g): g is { src: ImageMetadata; alt: string } => "src" in g) ?? null,
+    phones: null,
+    facts: o.facts,
+  })),
+];
 ---
 
 <section class="sec wrap" id="work" aria-labelledby="work-title">
   <header class="sec__head">
     <h2 id="work-title">Selected work</h2>
-    <p>Three I would defend in an interview. Open one.</p>
+    <p>Five I would defend in an interview. Open one.</p>
   </header>
 
   <ul class="plates" role="list">
     {
-      projects.map(({ id, data }, i) => (
+      plates.map((p, i) => (
         <li style={`--i:${i}`}>
-          <button class="plate" type="button" data-opens={`d-${id}`} aria-haspopup="dialog">
+          <button class="plate" type="button" data-opens={`d-${p.id}`} aria-haspopup="dialog">
             <span class="plate__tab">
               <span class="plate__fig">Fig. {fig(i)}</span>
-              <span class="plate__kind">{data.kind}</span>
+              <span class="plate__kind">{p.kind}</span>
             </span>
 
             <span class="plate__visual">
-              {data.cover && data.cover.shape === "phones" ? (
+              {p.phones ? (
                 <span class="plate__phones">
-                  {data.gallery.slice(0, 2).map((g) => (
+                  {p.phones.map((g) => (
                     <Picture src={g.src} alt="" widths={[180, 270]} sizes="7rem" formats={["avif", "webp"]} />
                   ))}
                 </span>
-              ) : data.cover ? (
-                <Picture src={data.cover.src} alt="" widths={[360, 540]} sizes="(min-width: 48rem) 22rem, 88vw" formats={["avif", "webp"]} />
+              ) : p.cover ? (
+                <Picture src={p.cover.src} alt="" widths={[360, 540]} sizes="(min-width: 48rem) 22rem, 88vw" formats={["avif", "webp"]} />
               ) : (
                 <span class="plate__spec">
-                  {data.facts.slice(0, 3).map((f) => (
+                  {p.facts.slice(0, 3).map((f) => (
                     <span class="plate__spec-row">
                       <span>{f.label}</span>
                       <b>{f.value}</b>
@@ -128,13 +154,13 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
             </span>
 
             <span class="plate__body">
-              <span class="plate__title">{data.title}</span>
-              <span class="plate__summary">{data.summary}</span>
+              <span class="plate__title">{p.title}</span>
+              <span class="plate__summary">{p.summary}</span>
               <span class="plate__chips">
-                {data.technologies.slice(0, 3).map((t) => (
+                {p.technologies.slice(0, 3).map((t) => (
                   <span>{t}</span>
                 ))}
-                {data.technologies.length > 3 && <span class="plate__chips-rest">+{data.technologies.length - 3}</span>}
+                {p.technologies.length > 3 && <span class="plate__chips-rest">+{p.technologies.length - 3}</span>}
               </span>
               <span class="plate__open" aria-hidden="true">Open plate</span>
             </span>
@@ -143,33 +169,6 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
       ))
     }
   </ul>
-
-  <div class="also sd-rise">
-    <h3 class="also__title">Also on GitHub</h3>
-    <ul class="also__list" role="list">
-      {
-        others.map((o) => (
-          <li>
-            <button class="plate plate--small" type="button" data-opens={`d-${o.id}`} aria-haspopup="dialog">
-              <span class="plate__tab">
-                <span class="plate__kind">{o.kind}</span>
-              </span>
-              <span class="plate__body">
-                <span class="plate__title">{o.title}</span>
-                <span class="plate__summary">{o.summary}</span>
-                <span class="plate__chips">
-                  {o.technologies.slice(0, 3).map((t) => (
-                    <span>{t}</span>
-                  ))}
-                </span>
-                <span class="plate__open" aria-hidden="true">Open plate</span>
-              </span>
-            </button>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
 </section>
 
 {
@@ -806,30 +805,4 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
     }
   }
 
-  .also {
-    margin-top: var(--space-8);
-    padding-top: var(--space-5);
-    border-top: 1px solid var(--rule-2);
-  }
-  .also__title {
-    margin: 0 0 var(--space-4);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-  .also__list {
-    display: grid;
-    gap: var(--space-4);
-    margin: 0;
-    padding: 0;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-  }
-  .plate--small .plate__title {
-    font-size: var(--step-1);
-  }
-  .plate--small .plate__body {
-    padding: var(--space-4);
-  }
 </style>
