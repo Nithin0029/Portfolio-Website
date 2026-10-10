@@ -36,8 +36,8 @@ export const placements: Placement[] = [
     result: "Second place",
     short: "2nd",
     built:
-      "T7SkillUp, a skill-tracking platform that measures a student's progress against industry expectations, with dashboards for institutions.",
-    repo: { label: "T7skillup", href: "https://github.com/Nithin0029/T7skillup" },
+      "T7 Learning Hub, which reads a résumé against job descriptions and returns a ranked skill roadmap, with a browser extension that rates how useful a video is against the goal you set.",
+    repo: { label: "T7-Learning-Hub", href: "https://github.com/Nithin0029/T7-Learning-Hub" },
   },
   {
     date: "2026-02-11",
