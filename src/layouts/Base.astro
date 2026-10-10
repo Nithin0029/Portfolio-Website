@@ -65,6 +65,14 @@ const jsonLd = {
     <script is:inline>
       // Runs before first paint, and again after every client-side navigation,
       // so the chosen theme never flashes.
+      // The hero's opening sequence is the only way its content becomes
+      // visible, so it is gated on this class: without scripting the hero
+      // renders finished instead of holding an empty frame.
+      document.documentElement.classList.add("js");
+      document.addEventListener("astro:before-swap", (e) =>
+        e.newDocument.documentElement.classList.add("js"),
+      );
+
       const applyTheme = (doc) => {
         try {
           const t = localStorage.getItem("theme");

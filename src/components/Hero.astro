@@ -3,8 +3,8 @@ import { links } from "../data/site";
 
 ---
 
-<section class="sheet" aria-labelledby="hero-name">
-  <div class="sheet__field wrap">
+<section class="plan" aria-labelledby="hero-name">
+  <div class="plan__field wrap">
     <span class="reg reg--tl" aria-hidden="true"></span>
     <span class="reg reg--tr" aria-hidden="true"></span>
     <span class="reg reg--bl" aria-hidden="true"></span>
@@ -34,16 +34,30 @@ import { links } from "../data/site";
   </div>
 </section>
 
+<script>
+  // The failsafe for the opening sequence. It runs well after the sequence
+  // would have finished, and again whenever the tab comes back, because a
+  // tab that was in the background at load never started it.
+  const settle = () => document.querySelector(".plan")?.setAttribute("data-revealed", "");
+  const arm = () => {
+    window.setTimeout(settle, 2200);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) window.setTimeout(settle, 2200);
+    });
+  };
+  document.addEventListener("astro:page-load", arm);
+</script>
+
 <style>
   /* The sheet: drafting paper with a faint grid, ruled at its edges. */
-  .sheet {
+  .plan {
     background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 1.5rem 1.5rem;
     background-position: center top;
   }
 
-  .sheet__field {
+  .plan__field {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -156,27 +170,41 @@ import { links } from "../data/site";
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .sheet {
+    :global(html.js) .plan {
       animation: ink 600ms linear both;
     }
-    .hero__given > span {
+    :global(html.js) .hero__given > span {
       animation: letter 760ms var(--ease-out) 120ms both;
     }
-    .hero__detail > span {
+    :global(html.js) .hero__detail > span {
       animation: letter 760ms var(--ease-out) 240ms both;
     }
-    .hero__line {
+    :global(html.js) .hero__line {
       animation: lift 640ms var(--ease-out) 520ms both;
     }
-    .hero__actions {
+    :global(html.js) .hero__actions {
       animation: lift 640ms var(--ease-out) 640ms both;
     }
-    .reg {
+    :global(html.js) .reg {
       animation: ink 320ms linear 820ms both;
     }
-    .hero__detail {
+    :global(html.js) .hero__detail {
       animation: mark 420ms var(--ease-out) 980ms both;
     }
+  }
+
+  /* If the sequence cannot run — a backgrounded tab, a throttled renderer,
+     anything that stops animations — this returns every piece of it to its
+     resting state, which is visible. Nothing here is allowed to be the only
+     path to seeing the hero. */
+  .plan[data-revealed],
+  .plan[data-revealed] .hero__given > span,
+  .plan[data-revealed] .hero__detail > span,
+  .plan[data-revealed] .hero__detail,
+  .plan[data-revealed] .hero__line,
+  .plan[data-revealed] .hero__actions,
+  .plan[data-revealed] .reg {
+    animation: none;
   }
 
   @keyframes letter {
