@@ -1,47 +1,59 @@
 ---
 import { getCollection, render } from "astro:content";
 import { Picture } from "astro:assets";
+import studyLightSchematic from "../assets/img/study-light-schematic.png";
+
+// A diagram is either an imported asset Astro can optimise, or an SVG served
+// as-is from public/ — the narrowing below depends on which key it carries.
+type Shot = { src: ImageMetadata; alt: string } | { url: string; alt: string };
+interface Other {
+  id: string;
+  title: string;
+  kind: string;
+  meta: string;
+  summary: string;
+  facts: { label: string; value: string }[];
+  notes: string[];
+  technologies: string[];
+  links: { label: string; href: string }[];
+  gallery?: Shot[];
+}
 
 const entries = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
 const projects = await Promise.all(
   entries.map(async (entry) => ({ ...entry, Content: (await render(entry)).Content })),
 );
 
-const others = [
+const others: Other[] = [
   {
-    id: "study-light",
-    title: "Study light",
+    id: "smart-room",
+    title: "Smart Room",
     kind: "Firmware, hardware",
     meta: "Sole developer, Sep 2026",
     summary:
-      "A relay wired in between my room's wall switch and its tube light, so the light answers to Wi-Fi and to voice while the physical switch keeps working.",
+      "Five ESP32 subsystems for one room: a relay on the tube light, a pair of servos that work the wall switch by hand, gas and climate sensing on a display, and a build that brings them together.",
     facts: [
-      { label: "Board", value: "ESP32 Dev Module" },
+      { label: "Subsystems", value: "5" },
+      { label: "Firmware", value: "338 lines of C++" },
       { label: "Switched load", value: "230 V tube light" },
       { label: "Control", value: "SinricPro, Alexa / Google Home" },
-      { label: "Firmware", value: "44 lines of C++" },
-      { label: "Commits", value: "4, all mine" },
+      { label: "Commits", value: "6, all mine" },
     ],
     notes: [
-      "The relay switches the live line through its normally-open contact, on purpose. If the ESP32 crashes or loses power the coil de-energises, the contact springs open and the light fails off rather than on. Neutral never passes through the relay at all.",
+      "The relay switches the live line through its normally-open contact, on purpose. If the ESP32 crashes or loses power the coil de-energises, the contact springs open and the light fails off rather than on. Neutral never passes through the relay at all, and the schematic says so in as many words.",
+      "Two servos sit over the physical wall switch and press it, one for on and one for off, so the room still works for anyone who has never heard of the app. The press angles are still marked in the source as needing calibration against the real switch.",
+      "An MQ-135 and a DHT22 report air quality, temperature and humidity to an SSD1306 display. The gas sensor reads on an ADC1 pin because ADC2 stops working once Wi-Fi is up — chosen before Wi-Fi was added, so the pin would not have to change later.",
       "SinricPro 5.x uses std::variant internally, which needs C++17, but the ESP32 Arduino core still compiles at -std=gnu++11. The build has to unset that flag before adding its own, or it fails inside the library rather than in my code.",
-      "The ON and OFF constants are flipped relative to the raw relay, which triggers on a LOW input. On the bench SinricPro reported the opposite of what the relay actually did, so I swapped the meaning of the two constants instead of hiding the mismatch behind an inverted write, and left a comment saying to re-verify it on any new relay module.",
-      "Wi-Fi and SinricPro credentials live in a gitignored secrets.h, with an example header committed in its place. The repository also holds an MQ-135 smoke sensor sketch, still standalone — it reads on an ADC1 pin so it keeps working once Wi-Fi is added.",
     ],
-    technologies: ["C++17", "PlatformIO", "ESP32", "Arduino", "SinricPro"],
+    technologies: ["C++17", "PlatformIO", "ESP32", "SinricPro", "DHT22", "MQ-135", "SSD1306"],
     links: [{ label: "Source on GitHub", href: "https://github.com/Nithin0029/Smart-Room" }],
-  },
-  {
-    id: "t7-logistics",
-    title: "T7-Logistics",
-    kind: "Web app, hackathon build",
-    meta: "Team build, Apr 2026",
-    summary:
-      "A quick-commerce control centre where simulated agents pick a store, check stock, dispatch and route an order.",
-    facts: [{ label: "Result", value: "Best Implementation, Vibeathon 2k26" }],
-    notes: [] as string[],
-    technologies: ["React", "Express"],
-    links: [{ label: "Source on GitHub", href: "https://github.com/Nithin0029/T7-Logistics" }],
+    gallery: [
+      { src: studyLightSchematic, alt: "Schematic for the tube light: mains through a breaker to the relay's normally-open contact, neutral running straight to the tube, and the ESP32 driving the relay over three low-voltage lines." },
+      { url: "/diagrams/smart-room-main.svg", alt: "Schematic for the combined build, wiring the relay, both servos, the MQ-135, the DHT22 and the OLED to one ESP32." },
+      { url: "/diagrams/smart-room-sensors.svg", alt: "Schematic for the sensor subsystem: MQ-135 on an ADC1 pin, DHT22, and an SSD1306 display over I2C." },
+      { url: "/diagrams/smart-room-servo.svg", alt: "Schematic for the single-servo switch presser." },
+      { url: "/diagrams/smart-room-servo-pair.svg", alt: "Schematic for the two-servo arrangement, one arm for on and one for off." },
+    ],
   },
 ];
 
@@ -131,7 +143,13 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
 </section>
 
 {
-  projects.map(({ id, data, Content }, i) => (
+  projects.map(({ id, data, Content }, i) => {
+    // the cover leads, then anything else the project has
+    const shots = [
+      ...(data.cover ? [{ src: data.cover.src, alt: data.cover.alt }] : []),
+      ...data.gallery.filter((g) => !data.cover || g.src !== data.cover.src),
+    ];
+    return (
       <dialog class="sheet" id={`d-${id}`} aria-labelledby={`d-${id}-t`}>
         <div class="sheet__head">
           <div>
@@ -147,17 +165,28 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
         </div>
 
         <div class="sheet__body">
-          {data.cover && (
-            <figure class="sheet__plate">
-              <div class={data.cover.shape === "phones" ? "sheet__frame sheet__frame--tall" : "sheet__frame"}>
-                <Picture
-                  src={data.cover.src}
-                  alt={data.cover.alt}
-                  widths={[480, 720]}
-                  sizes="(min-width: 48rem) 34rem, 88vw"
-                  formats={["avif", "webp"]}
-                />
+          {shots.length > 0 && (
+            <figure class="gal" data-gal>
+              <div class={data.cover?.shape === "phones" ? "sheet__frame sheet__frame--tall" : "sheet__frame"}>
+                {shots.map((g, n) => (
+                  <div class="gal__slide" data-gal-slide hidden={n > 0}>
+                    <Picture
+                      src={g.src}
+                      alt={g.alt}
+                      widths={[480, 720]}
+                      sizes="(min-width: 48rem) 34rem, 88vw"
+                      formats={["avif", "webp"]}
+                    />
+                  </div>
+                ))}
               </div>
+              {shots.length > 1 && (
+                <figcaption class="gal__bar">
+                  <button class="gal__nav" type="button" data-gal-prev aria-label="Previous image">‹</button>
+                  <span class="gal__count num" data-gal-count aria-live="polite">1 / {shots.length}</span>
+                  <button class="gal__nav" type="button" data-gal-next aria-label="Next image">›</button>
+                </figcaption>
+              )}
             </figure>
           )}
 
@@ -192,7 +221,8 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
           </div>
         </div>
       </dialog>
-  ))
+    );
+  })
 }
 
 {
@@ -212,6 +242,29 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
       </div>
 
       <div class="sheet__body">
+        {o.gallery && o.gallery.length > 0 && (
+          <figure class="gal" data-gal>
+            <div class="sheet__frame">
+              {o.gallery.map((g, n) => (
+                <div class="gal__slide" data-gal-slide hidden={n > 0}>
+                  {"src" in g ? (
+                    <Picture src={g.src} alt={g.alt} widths={[480, 720, 1080]} sizes="(min-width: 48rem) 34rem, 88vw" formats={["avif", "webp"]} />
+                  ) : (
+                    <img src={g.url} alt={g.alt} loading="lazy" decoding="async" />
+                  )}
+                </div>
+              ))}
+            </div>
+            {o.gallery.length > 1 && (
+              <figcaption class="gal__bar">
+                <button class="gal__nav" type="button" data-gal-prev aria-label="Previous diagram">‹</button>
+                <span class="gal__count num" data-gal-count aria-live="polite">1 / {o.gallery.length}</span>
+                <button class="gal__nav" type="button" data-gal-next aria-label="Next diagram">›</button>
+              </figcaption>
+            )}
+          </figure>
+        )}
+
         <p class="sheet__summary">{o.summary}</p>
 
         <dl class="sheet__facts">
@@ -288,6 +341,27 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
         opener = card;
         lock();
         sheet.showModal();
+      });
+    });
+
+    // Each gallery steps through its own slides. Hidden is toggled rather
+    // than opacity, so only the shown image is in the accessibility tree and
+    // nothing is left invisible if a style fails to load.
+    document.querySelectorAll<HTMLElement>("[data-gal]").forEach((gal) => {
+      const slides = [...gal.querySelectorAll<HTMLElement>("[data-gal-slide]")];
+      const count = gal.querySelector<HTMLElement>("[data-gal-count]");
+      if (slides.length < 2) return;
+      let at = 0;
+      const show = (next: number) => {
+        at = (next + slides.length) % slides.length;
+        slides.forEach((s, i) => (s.hidden = i !== at));
+        if (count) count.textContent = `${at + 1} / ${slides.length}`;
+      };
+      gal.querySelector("[data-gal-prev]")?.addEventListener("click", () => show(at - 1));
+      gal.querySelector("[data-gal-next]")?.addEventListener("click", () => show(at + 1));
+      gal.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") show(at - 1);
+        if (e.key === "ArrowRight") show(at + 1);
       });
     });
 
@@ -472,11 +546,58 @@ const fig = (i: number) => String(i + 1).padStart(2, "0");
     color: var(--accent);
   }
 
-  /* the screenshot, mounted on the ground like a plate on a sheet */
-  .sheet__plate {
+  /* the drawings, mounted on the ground and stepped through one at a time */
+  .gal {
     margin: 0;
     display: grid;
+    gap: var(--space-3);
+  }
+  .gal__slide :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    /* the diagrams are drawn on white, so they keep their own paper */
+    background: #ffffff;
+  }
+  .gal__bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: var(--space-4);
+  }
+  .gal__nav {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--radius-sm);
+    background: var(--ground);
+    color: var(--text);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      border-color var(--dur-1) linear,
+      color var(--dur-1) linear;
+  }
+  .gal__nav:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .gal__count {
+    min-width: 4ch;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gal__nav {
+      transition: none;
+    }
   }
   .sheet__frame {
     padding: var(--space-3);

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 684" width="720" height="684" font-family="Helvetica, Arial, sans-serif">
+<rect width="720" height="684" fill="#ffffff"/>
+<text x="40" y="36" font-size="20" font-weight="700" fill="#111">MQT135_DHT22_DISP - schematic</text>
+<text x="40" y="58" font-size="13" fill="#555">MQ-135 + DHT22 + OLED sensor cluster (no WiFi)</text>
+<rect x="40" y="80" width="170" height="384" rx="8" fill="#eef3fb" stroke="#1d3557" stroke-width="2"/>
+<text x="125.0" y="104" text-anchor="middle" font-size="15" font-weight="700" fill="#1d3557">ESP32 Dev Module</text>
+<text x="125.0" y="122" text-anchor="middle" font-size="11" fill="#555">powered over USB</text>
+<rect x="340" y="90" width="200" height="102" rx="8" fill="#fafafa" stroke="#444" stroke-width="1.5"/>
+<text x="440.0" y="112" text-anchor="middle" font-size="14" font-weight="700" fill="#111">MQ-135</text>
+<text x="440.0" y="128" text-anchor="middle" font-size="11" fill="#666">air quality / smoke</text>
+<line x1="210" y1="148" x2="340" y2="148" stroke="#1d70b8" stroke-width="2.5"/>
+<circle cx="210" cy="148" r="4" fill="#1d70b8"/><circle cx="340" cy="148" r="4" fill="#1d70b8"/>
+<text x="200" y="152" text-anchor="end" font-size="12" font-weight="600" fill="#1d3557">GPIO34</text>
+<text x="350" y="152" font-size="12" fill="#111">AO</text>
+<line x1="540" y1="148" x2="585" y2="148" stroke="#d62828" stroke-width="2.5"/>
+<circle cx="540" cy="148" r="4" fill="#d62828"/><circle cx="585" cy="148" r="3.5" fill="#d62828"/>
+<text x="530" y="152" text-anchor="end" font-size="12" fill="#111">VCC</text>
+<line x1="540" y1="174" x2="610" y2="174" stroke="#222222" stroke-width="2.5"/>
+<circle cx="540" cy="174" r="4" fill="#222222"/><circle cx="610" cy="174" r="3.5" fill="#222222"/>
+<text x="530" y="178" text-anchor="end" font-size="12" fill="#111">GND</text>
+<rect x="340" y="210" width="200" height="102" rx="8" fill="#fafafa" stroke="#444" stroke-width="1.5"/>
+<text x="440.0" y="232" text-anchor="middle" font-size="14" font-weight="700" fill="#111">DHT22</text>
+<text x="440.0" y="248" text-anchor="middle" font-size="11" fill="#666">temperature / humidity</text>
+<line x1="210" y1="268" x2="340" y2="268" stroke="#2a9d8f" stroke-width="2.5"/>
+<circle cx="210" cy="268" r="4" fill="#2a9d8f"/><circle cx="340" cy="268" r="4" fill="#2a9d8f"/>
+<text x="200" y="272" text-anchor="end" font-size="12" font-weight="600" fill="#1d3557">GPIO4</text>
+<text x="350" y="272" font-size="12" fill="#111">S (data)</text>
+<line x1="540" y1="268" x2="585" y2="268" stroke="#d62828" stroke-width="2.5"/>
+<circle cx="540" cy="268" r="4" fill="#d62828"/><circle cx="585" cy="268" r="3.5" fill="#d62828"/>
+<text x="530" y="272" text-anchor="end" font-size="12" fill="#111">+ (VCC)</text>
+<line x1="540" y1="294" x2="610" y2="294" stroke="#222222" stroke-width="2.5"/>
+<circle cx="540" cy="294" r="4" fill="#222222"/><circle cx="610" cy="294" r="3.5" fill="#222222"/>
+<text x="530" y="298" text-anchor="end" font-size="12" fill="#111">- (GND)</text>
+<rect x="340" y="330" width="200" height="102" rx="8" fill="#fafafa" stroke="#444" stroke-width="1.5"/>
+<text x="440.0" y="352" text-anchor="middle" font-size="14" font-weight="700" fill="#111">SSD1306 OLED</text>
+<text x="440.0" y="368" text-anchor="middle" font-size="11" fill="#666">128x64, I2C addr 0x3C</text>
+<line x1="210" y1="388" x2="340" y2="388" stroke="#8338ec" stroke-width="2.5"/>
+<circle cx="210" cy="388" r="4" fill="#8338ec"/><circle cx="340" cy="388" r="4" fill="#8338ec"/>
+<text x="200" y="392" text-anchor="end" font-size="12" font-weight="600" fill="#1d3557">GPIO21</text>
+<text x="350" y="392" font-size="12" fill="#111">SDA</text>
+<line x1="210" y1="414" x2="340" y2="414" stroke="#e76f51" stroke-width="2.5"/>
+<circle cx="210" cy="414" r="4" fill="#e76f51"/><circle cx="340" cy="414" r="4" fill="#e76f51"/>
+<text x="200" y="418" text-anchor="end" font-size="12" font-weight="600" fill="#1d3557">GPIO22</text>
+<text x="350" y="418" font-size="12" fill="#111">SCL</text>
+<line x1="540" y1="388" x2="635" y2="388" stroke="#f08c00" stroke-width="2.5"/>
+<circle cx="540" cy="388" r="4" fill="#f08c00"/><circle cx="635" cy="388" r="3.5" fill="#f08c00"/>
+<text x="530" y="392" text-anchor="end" font-size="12" fill="#111">VCC</text>
+<line x1="540" y1="414" x2="610" y2="414" stroke="#222222" stroke-width="2.5"/>
+<circle cx="540" cy="414" r="4" fill="#222222"/><circle cx="610" cy="414" r="3.5" fill="#222222"/>
+<text x="530" y="418" text-anchor="end" font-size="12" fill="#111">GND</text>
+<line x1="585" y1="148" x2="585" y2="504" stroke="#d62828" stroke-width="3"/>
+<line x1="610" y1="174" x2="610" y2="504" stroke="#222222" stroke-width="3"/>
+<line x1="635" y1="388" x2="635" y2="504" stroke="#f08c00" stroke-width="3"/>
+<rect x="520" y="504" width="190" height="64" rx="8" fill="#fff4e0" stroke="#8a5a00" stroke-width="2"/>
+<text x="615" y="538" text-anchor="middle" font-size="14" font-weight="700" fill="#5c3b00">HW-131 power module</text>
+<text x="615" y="554" text-anchor="middle" font-size="11" fill="#7a5a20">own supply - not the ESP32 regulator</text>
+<text x="585" y="518" text-anchor="middle" font-size="10" font-weight="700" fill="#d62828">5V</text>
+<text x="610" y="518" text-anchor="middle" font-size="10" font-weight="700" fill="#222222">GND</text>
+<text x="635" y="518" text-anchor="middle" font-size="10" font-weight="700" fill="#f08c00">3.3V</text>
+<circle cx="125.0" cy="464" r="4" fill="#222"/>
+<text x="125.0" y="456" text-anchor="middle" font-size="12" font-weight="600" fill="#1d3557">GND</text>
+<polyline points="125.0,464 125.0,598 610,598 610,568" fill="none" stroke="#222" stroke-width="2.5" stroke-dasharray="7 4"/>
+<circle cx="610" cy="568" r="4" fill="#222"/>
+<text x="135.0" y="592" font-size="11" fill="#222">common GND (ESP32 to HW-131)</text>
+<text x="40" y="632" font-size="12" fill="#444">Wire each line as ONE continuous jumper - chained jumpers add resistance and trigger brownouts.</text>
+<text x="40" y="650" font-size="12" fill="#444">Signal wires are colored; red = 5V, orange = 3.3V, black = GND. Pin names follow the common module silkscreen.</text>
+</svg>
