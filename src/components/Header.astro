@@ -36,7 +36,7 @@ import { nav, person } from "../data/site";
             <circle cx="10" cy="10" r="6.5" />
             <path d="M10 3.5a6.5 6.5 0 0 1 0 13z" class="fill" />
           </svg>
-          <span>Light theme</span>
+          <span data-theme-label>Dark theme</span>
         </button>
         <a class="btn btn--primary bar__cta" href="/#contact">Contact</a>
       </div>
@@ -143,9 +143,12 @@ import { nav, person } from "../data/site";
     // the theme already showing, so on a light system nothing would happen.
     const current = () => root.dataset.theme ?? (prefersDark.matches ? "dark" : "light");
 
+    const themeLabel = toggle.querySelector<HTMLElement>("[data-theme-label]");
     const sync = () => {
       const light = current() === "light";
       toggle.setAttribute("aria-pressed", String(light));
+      // the control is named for what pressing it will do, not for where it is
+      if (themeLabel) themeLabel.textContent = light ? "Dark theme" : "Light theme";
       document
         .querySelector('meta[name="theme-color"]')
         ?.setAttribute("content", light ? "#e7e9e5" : "#15181a");

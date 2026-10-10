@@ -1,5 +1,5 @@
 ---
-import { links } from "../data/site";
+import { links, person } from "../data/site";
 
 const subject = "Hello from your portfolio";
 const mailto = `mailto:${links.email}?subject=${encodeURIComponent(subject)}`;
@@ -17,6 +17,10 @@ const gmail =
 
   <div class="contact">
     <div class="contact__mail sd-rise" data-copy-scope>
+      <p class="contact__status-line">
+        <span class="contact__dot" aria-hidden="true"></span>
+        {person.availability}
+      </p>
       <a class="contact__address" href={mailto}>{links.email}</a>
       <div class="contact__actions">
         <a class="btn btn--primary" href={mailto}>Write an email</a>
@@ -28,26 +32,34 @@ const gmail =
       </div>
     </div>
 
-    <ul class="contact__links sd-rise" role="list">
-      <li>
-        <a href={links.github}>
-          <span>GitHub</span>
-          <span class="contact__handle">@{links.githubHandle}</span>
-        </a>
-      </li>
-      <li>
-        <a href={links.linkedin}>
-          <span>LinkedIn</span>
-          <span class="contact__handle">Nithelan Jayakumar</span>
-        </a>
-      </li>
-      <li>
-        <a href={links.resume}>
-          <span>Résumé</span>
-          <span class="contact__handle">PDF, {links.resumeSize}</span>
-        </a>
-      </li>
-    </ul>
+    <div class="contact__aside sd-rise">
+      <ul class="contact__links" role="list">
+        <li>
+          <a href={links.github}>
+            <span>GitHub</span>
+            <span class="contact__handle">@{links.githubHandle}</span>
+          </a>
+        </li>
+        <li>
+          <a href={links.linkedin}>
+            <span>LinkedIn</span>
+            <span class="contact__handle">Nithelan Jayakumar</span>
+          </a>
+        </li>
+        <li>
+          <a href={links.resume}>
+            <span>Résumé</span>
+            <span class="contact__handle">PDF, {links.resumeSize}</span>
+          </a>
+        </li>
+      </ul>
+
+      <dl class="contact__where">
+        <div><dt>Based in</dt><dd>{person.location}</dd></div>
+        <div><dt>Time zone</dt><dd class="num">UTC+05:30</dd></div>
+        <div><dt>Replies</dt><dd>Within a day, usually</dd></div>
+      </dl>
+    </div>
   </div>
 </section>
 
@@ -60,8 +72,35 @@ const gmail =
     .contact {
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
       column-gap: var(--space-8);
-      align-items: end;
+      align-items: start;
     }
+  }
+
+  .contact__mail {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  /* the availability belongs here, where someone has decided to make contact */
+  .contact__status-line {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-2);
+  }
+  .contact__dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translateY(-0.05em);
   }
 
   .contact__address {
@@ -85,7 +124,7 @@ const gmail =
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3);
-    margin-top: var(--space-6);
+    margin-top: var(--space-2);
   }
   .contact__status {
     color: var(--text-2);
@@ -93,9 +132,16 @@ const gmail =
     min-width: 1px;
   }
 
+  .contact__aside {
+    display: grid;
+    gap: var(--space-5);
+  }
   .contact__links {
+    margin: 0;
     border: 1px solid var(--rule-2);
+    border-radius: var(--radius);
     background: var(--raised);
+    overflow: hidden;
   }
   .contact__links a {
     display: flex;
@@ -119,5 +165,33 @@ const gmail =
     font-family: var(--mono);
     font-weight: 400;
     font-size: 0.8125rem;
+  }
+
+  /* what someone writing to me would want to know before they do */
+  .contact__where {
+    display: grid;
+    margin: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .contact__where div {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .contact__where dt {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .contact__where dd {
+    margin: 0;
+    font-size: var(--step--1);
+    font-weight: 500;
+    text-align: right;
   }
 </style>

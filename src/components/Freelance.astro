@@ -63,10 +63,34 @@ const timelines = ["As soon as possible", "Within a month", "One to three months
       </ul>
     </div>
 
-    <form class="rq sd-rise" data-enquiry novalidate aria-labelledby="rq-title">
-      <div class="rq__tab">
-        <span class="rq__kind" id="rq-title">Enquiry</span>
-        <span class="rq__ref">For {links.email}</span>
+    <div class="fl__open sd-rise">
+      <p class="fl__openNote">
+        A short form, so the first message already carries what I need to answer it.
+      </p>
+      <button class="btn btn--primary fl__btn" type="button" data-opens="d-enquiry" aria-haspopup="dialog">
+        Start an enquiry
+      </button>
+      <p class="fl__openFine">Nothing is sent from this page — it opens the message in your own mail.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Uses the dialog machinery in ProjectPlates.astro: any [data-opens] button
+     and any dialog.sheet on the page are wired there, including the focus
+     return and the scroll lock. -->
+<dialog class="sheet sheet--rq" id="d-enquiry" aria-labelledby="rq-title">
+  <form data-enquiry novalidate>
+      <div class="sheet__head">
+        <div>
+          <p class="sheet__kind">Freelance</p>
+          <h3 id="rq-title">Enquiry</h3>
+          <p class="sheet__meta">For {links.email}</p>
+        </div>
+        <button class="sheet__x" type="button" data-close aria-label="Close the enquiry">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
       </div>
 
       <div class="rq__body">
@@ -133,9 +157,8 @@ const timelines = ["As soon as possible", "Within a month", "One to three months
           so you can read it before it goes.
         </p>
       </div>
-    </form>
-  </div>
-</section>
+  </form>
+</dialog>
 
 <script>
   const setup = () => {
@@ -276,37 +299,41 @@ const timelines = ["As soon as possible", "Within a month", "One to three months
     color: var(--text-3);
   }
 
-  /* ---- the enquiry, laid out as a request sheet ---- */
-
-  .rq {
+  /* the one control that stands in for the whole form */
+  .fl__open {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    align-content: start;
+    padding: var(--space-5);
     background: var(--raised);
     border: 1px solid var(--rule-2);
     border-radius: var(--radius);
     box-shadow: var(--lift);
-    overflow: hidden;
   }
-  .rq__tab {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2) var(--space-4);
-    padding: var(--space-3) var(--space-4);
-    background: var(--ground);
-    border-bottom: 1px solid var(--rule);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
+  .fl__openNote {
+    margin: 0;
+    font-family: var(--prose);
+    font-weight: 300;
+    font-size: var(--step-1);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+  .fl__btn {
+    min-height: 3rem;
+    padding-inline: var(--space-6);
+  }
+  .fl__openFine {
+    margin: 0;
     color: var(--text-3);
+    font-size: var(--step--1);
+    line-height: 1.5;
   }
-  .rq__kind {
-    color: var(--accent);
-  }
-  .rq__ref {
-    font-family: var(--mono);
-    letter-spacing: 0;
-    text-transform: none;
+
+  /* ---- the enquiry, inside its dialog ---- */
+
+  .sheet--rq {
+    width: min(38rem, calc(100vw - 2rem));
   }
 
   .rq__body {
