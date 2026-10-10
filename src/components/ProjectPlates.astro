@@ -2,6 +2,8 @@
 import { getCollection, render } from "astro:content";
 import { Picture } from "astro:assets";
 import studyLightSchematic from "../assets/img/study-light-schematic.png";
+import t7SkillTree from "../assets/img/t7-skill-tree.png";
+import t7Extension from "../assets/img/t7-extension.png";
 
 // A diagram is either an imported asset Astro can optimise, or an SVG served
 // as-is from public/ — the narrowing below depends on which key it carries.
@@ -25,6 +27,34 @@ const projects = await Promise.all(
 );
 
 const others: Other[] = [
+  {
+    id: "t7-learning-hub",
+    title: "T7 Learning Hub",
+    kind: "Web app, team build",
+    meta: "Team of three, Mar – May 2026",
+    summary:
+      "A career-planning tool that reads a résumé against job descriptions and returns a ranked skill roadmap, with a Chrome extension that rates how useful a YouTube video is against the goal you set.",
+    facts: [
+      { label: "Team", value: "Three of us" },
+      { label: "My commits", value: "3 of 11" },
+      { label: "What I wrote", value: "674 lines" },
+      { label: "Result", value: "Second place, Vibeathon" },
+    ],
+    notes: [
+      "My part is the T7 Hub: a FastAPI router and the Next.js workspace page that drives it, 674 lines across the two. The router takes an uploaded résumé, pulls the text out with PyMuPDF, puts it to a language model against a target role, and writes the result back through Firebase.",
+      "It is built on DeepTutor, an Apache-2.0 tutoring project from HKUDS that is vendored into the repository. The tutoring engine underneath is theirs; the hub on top of it is mine.",
+      "The Chrome extension and the résumé scorer are my teammates' work. Of the eleven commits, six are Abhishek's and two are Bharath's.",
+    ],
+    technologies: ["React", "Vite", "FastAPI", "Next.js", "Firebase", "Gemini", "Tailwind"],
+    links: [
+      { label: "Live site", href: "https://t7skillup.vercel.app" },
+      { label: "Source on GitHub", href: "https://github.com/Nithin0029/T7-Learning-Hub" },
+    ],
+    gallery: [
+      { src: t7SkillTree, alt: "The career roadmap screen: skills ranked by priority for a Data Analyst role, each with an estimated time and a pending state, beside lists of skills already held and still to learn." },
+      { src: t7Extension, alt: "The browser extension open beside a YouTube lesson, rating the video for quality and how well it matches the learner's goal, with a written summary underneath." },
+    ],
+  },
   {
     id: "smart-room",
     title: "Smart Room",
